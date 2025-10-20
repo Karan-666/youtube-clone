@@ -1,3 +1,4 @@
+import { login, register } from "../controllers/user.controller";
 
 
 function userRoutes(App){
