@@ -10,6 +10,7 @@ import appStore from "./utils/appStore.js";
 
 // importing routing components
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
+import Body from "./components/Body.jsx";
 
 
 // ****************************** REACT ROUTER CONFIGURATION ******************************
@@ -39,7 +40,7 @@ const appRouter = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={appStore}>
-      <App />
+      <RouterProvider router={appRouter} />
     </Provider>
   </StrictMode>
 );

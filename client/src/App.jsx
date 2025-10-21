@@ -1,10 +1,20 @@
 import React from 'react'
 
+import { Outlet } from 'react-router-dom'
+import Header from './components/Header'
+import Footer from './components/Footer'
+
+
+
 function App() {
   return (
-    <div>
-      <h1 className="text-blue-600">Hello from App</h1>
-    </div>
+    <>
+      <Header />
+      {/* Outlet renders the content of the current child route. */}
+      {/* Its like a Placeholder */}
+      <Outlet /> 
+      <Footer/>
+    </>
   )
 }
 
