@@ -115,80 +115,92 @@ export async function login(req, res) {
 // channel creation is tightly attached with the user
 // Function to handle creating a new channel for the logged-in user (Protected POST)
 export async function createChannel(req, res) {
-    try {
-        // Get channel data from the request body. We only expect channelName and handle.
-        const { channelName, handle } = req.body;
-        // Get the authenticated user's ID from the JWT middleware (req.user is available).
-        const ownerId = req.user._id;
+  try {
+    // Get channel data from the request body. We only expect channelName and handle.
+    const { channelName, handle } = req.body;
+    // Get the authenticated user's ID from the JWT middleware (req.user is available).
+    const ownerId = req.user._id;
 
-        // ********************* VALIDATION: Check if user already owns a channel *********************
+    // ********************* VALIDATION: Check if user already owns a channel *********************
 
-        // Find a channel where the 'owner' ID matches the logged-in user's ID.
-        const existingChannelByUser = await ChannelModel.findOne({ owner: ownerId });
+    // Find a channel where the 'owner' ID matches the logged-in user's ID.
+    const existingChannelByUser = await ChannelModel.findOne({
+      owner: ownerId,
+    });
 
-        if (existingChannelByUser) {
-            // Return a 409 Conflict error if the user tries to create a second channel.
-            return res.status(409).json({ 
-                message: "User already owns a channel.",
-                channel: existingChannelByUser // Optional: returning the existing channel details.
-            });
-        }
-        
-        // ********************* VALIDATION: Check if channel handle is taken *********************
-
-        // Find a channel where the 'handle' matches the requested handle.
-        const existingChannelByHandle = await ChannelModel.findOne({ handle });
-
-        if (existingChannelByHandle) {
-            // Return a 409 Conflict error if the handle is already in use.
-            return res.status(409).json({ message: "Channel handle is already taken. Please choose another." });
-        }
-
-        // ********************* CREATE NEW CHANNEL *********************
-
-        // Create a new document in the 'channels' collection.
-        const newChannel = await ChannelModel.create({
-            channelName, 
-            handle, 
-            owner: ownerId, // Set the owner ID to the authenticated user.
-            // Other fields (subscribers, banner) will use their default values.
-        });
-
-        // Send a success response (201 Created) back to the client.
-        return res.status(201).json({ 
-            message: "Channel created successfully!",
-            channel: newChannel
-        });
-
-    } catch (error) {
-        // Handle any server or validation errors.
-        console.error("Error creating channel:", error);
-        return res.status(500).json({ message: "Internal server error during channel creation." });
+    if (existingChannelByUser) {
+      // Return a 409 Conflict error if the user tries to create a second channel.
+      return res.status(409).json({
+        message: "User already owns a channel.",
+        channel: existingChannelByUser, // Optional: returning the existing channel details.
+      });
     }
+
+    // ********************* VALIDATION: Check if channel handle is taken *********************
+
+    // Find a channel where the 'handle' matches the requested handle.
+    const existingChannelByHandle = await ChannelModel.findOne({ handle });
+
+    if (existingChannelByHandle) {
+      // Return a 409 Conflict error if the handle is already in use.
+      return res
+        .status(409)
+        .json({
+          message: "Channel handle is already taken. Please choose another.",
+        });
+    }
+
+    // ********************* CREATE NEW CHANNEL *********************
+
+    // Create a new document in the 'channels' collection.
+    const newChannel = await ChannelModel.create({
+      channelName,
+      handle,
+      owner: ownerId, // Set the owner ID to the authenticated user.
+      // Other fields (subscribers, banner) will use their default values.
+    });
+
+    // Send a success response (201 Created) back to the client.
+    return res.status(201).json({
+      message: "Channel created successfully!",
+      channel: newChannel,
+    });
+  } catch (error) {
+    // Handle any server or validation errors.
+    console.error("Error creating channel:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error during channel creation." });
+  }
 }
 
 // Function to handle fetching details for a specific channel by its unique handle (Public GET)
 // I put the controller logic in user.controller.js to simplify development, as the actions are all about the owner.
 export async function fetchChannelByHandle(req, res) {
-    try {
-        // Get the channel handle from the dynamic URL path (e.g., /api/channel/@coder-karan).
-        const { handle } = req.params; 
-        
-        // Use Mongoose to find ONE channel where the 'handle' matches the URL parameter.
-        const channelDetails = await ChannelModel.findOne({ handle });
+  try {
+    // Get the channel handle from the dynamic URL path (e.g., /api/channel/@coder-karan).
+    const { handle } = req.params;
 
-        // Check if the channel was found.
-        if (!channelDetails) {
-            // If the handle is not found, send a 404 Not Found error.
-            return res.status(404).json({ message: "Channel not found with this handle." });
-        }
+    // Use Mongoose to find ONE channel where the 'handle' matches the URL parameter.
+    const channelDetails = await ChannelModel.findOne({ handle });
 
-        // Send a success response (200 OK) with the channel details.
-        return res.status(200).json(channelDetails);
-
-    } catch (error) {
-        // Handle any server or database errors.
-        console.error("Error fetching channel details:", error);
-        return res.status(500).json({ message: "Internal server error while fetching channel details." });
+    // Check if the channel was found.
+    if (!channelDetails) {
+      // If the handle is not found, send a 404 Not Found error.
+      return res
+        .status(404)
+        .json({ message: "Channel not found with this handle." });
     }
+
+    // Send a success response (200 OK) with the channel details.
+    return res.status(200).json(channelDetails);
+  } catch (error) {
+    // Handle any server or database errors.
+    console.error("Error fetching channel details:", error);
+    return res
+      .status(500)
+      .json({
+        message: "Internal server error while fetching channel details.",
+      });
+  }
 }
