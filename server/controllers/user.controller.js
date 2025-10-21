@@ -1,57 +1,109 @@
-
 import mongoose from "mongoose";
 import UserModel from "../models/User.model.js";
 
 //Import bcrypt for hashing (encrypting) user passwords.
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 
-export async function register(req, res){
+//Import jsonwebtoken for creating secure access tokens (JWT).
+import jwt from "jsonwebtoken";
 
-    try{
+export async function register(req, res) {
+  try {
+    //Destructure the data sent from the frontend in the request body.
+    const { username, email, password } = req.body;
 
-        //Destructure the data sent from the frontend in the request body.
-        const {username, email, password} = req.body;
+    //Find one user where the email matches the provided email.
+    const emailCheck = await UserModel.findOne({ email });
 
-        //Find one user where the email matches the provided email.
-        const emailCheck = await UserModel.findOne({email});
-
-        // checking if user already exist
-        if(emailCheck){
-            return res.status(409).json({message: "Email already exist"});
-        }
-
-        //password hashing
-        // takes 2 argument, password and salt rounds (taken as 10)
-        const hashedPassword = bcrypt.hashSync(password, 10)
-
-        // creating new user with hashed password
-        const newUser = await UserModel.create({
-            username, // if key and value is same, no need write twice
-            email,
-            password : hashedPassword // Store the secure hash, NOT the plain text password.
-        })
-
-        // sending success reponse
-         return res.status(201).json({
-        message: "User registered successfully!",
-            user: { 
-                id: newUser._id,
-                username: newUser.username,
-                email: newUser.email,
-            }
-        });
-    } catch (err) {
-        // Handle any server or database errors.
-        console.error("Registration error:", err);
-        return res.status(500).json({ message: "Internal server error during registration." });
+    // checking if user already exist
+    if (emailCheck) {
+      return res.status(409).json({ message: "Email already exist" });
     }
+
+    //password hashing
+    // takes 2 argument, password and salt rounds (taken as 10)
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    // creating new user with hashed password
+    const newUser = await UserModel.create({
+      username, // if key and value is same, no need write twice
+      email,
+      password: hashedPassword, // Store the secure hash, NOT the plain text password.
+    });
+
+    // sending success reponse
+    return res.status(201).json({
+      message: "User registered successfully!",
+      user: {
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+      },
+    });
+  } catch (err) {
+    // Handle any server or database errors.
+    console.error("Registration error:", err);
+    return res
+      .status(500)
+      .json({ message: "Internal server error during registration." });
+  }
 }
 
 export async function login(req, res) {
-    
-    // This is a placeholder for the actual login logic.
-    return res.status(200).json({
-        message: "Login controller reached successfully! (Logic coming soon)",
-        data: req.body
+  try {
+    // Destructure email and password from the request body.
+    const { email, password } = req.body;
+
+    // Find one user where the email matches the provided email.
+    const existingUser = await UserModel.findOne({ email });
+
+    // If no user is found with that email:
+    if (!existingUser) {
+      // Return a 404 status code (Not Found) and an error message.
+      return res
+        .status(404)
+        .json({ message: "User not found with this email." });
+    }
+
+    // verify the hashed password
+    const isValidPassword = bcrypt.compareSync(password, existingUser.password);
+
+    // If the comparison fails (passwords do not match):
+    if (!isValidPassword) {
+      // Return a 401 status code (Unauthorized) and an error message.
+      return res
+        .status(401)
+        .json({ message: "Invalid credentials (password is wrong)." });
+    }
+
+    // generating jwt token
+
+    // payload here = unique data we want to store (user id)
+    const payload = {
+      id: existingUser._id,
+    };
+
+    // Create the token using the user ID payload and a secret key.
+    // We set the expiration for 60 minutes ('60m').
+    const accessToken = jwt.sign(payload, "secretkey", {
+      expiresIn: "60m", // Token expires after 60 minutes.
     });
+
+    //Send a success response (200 OK) with user info and the access token.
+    return res.status(200).json({
+      message: "Login successful!",
+      user: {
+        id: existingUser._id,
+        username: existingUser.username,
+        email: existingUser.email,
+      },
+      accessToken: accessToken, // Send the JWT token to the client.
+    });
+  } catch (err) {
+    // Handle any server or database errors.
+    console.error("Login error:", err);
+    return res
+      .status(500)
+      .json({ message: "Internal server error during login." });
+  }
 }
