@@ -167,3 +167,28 @@ export async function createChannel(req, res) {
     }
 }
 
+// Function to handle fetching details for a specific channel by its unique handle (Public GET)
+// I put the controller logic in user.controller.js to simplify development, as the actions are all about the owner.
+export async function fetchChannelByHandle(req, res) {
+    try {
+        // Get the channel handle from the dynamic URL path (e.g., /api/channel/@coder-karan).
+        const { handle } = req.params; 
+        
+        // Use Mongoose to find ONE channel where the 'handle' matches the URL parameter.
+        const channelDetails = await ChannelModel.findOne({ handle });
+
+        // Check if the channel was found.
+        if (!channelDetails) {
+            // If the handle is not found, send a 404 Not Found error.
+            return res.status(404).json({ message: "Channel not found with this handle." });
+        }
+
+        // Send a success response (200 OK) with the channel details.
+        return res.status(200).json(channelDetails);
+
+    } catch (error) {
+        // Handle any server or database errors.
+        console.error("Error fetching channel details:", error);
+        return res.status(500).json({ message: "Internal server error while fetching channel details." });
+    }
+}
