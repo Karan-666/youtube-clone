@@ -45,7 +45,7 @@ const channelSchema = new mongoose.Schema({
 });
 
 // Create the Model from the Schema.
-// Mongoose will use the collection name 'channels'.
+// Mongoose will use the collection name 'channel'.
 const ChannelModel = mongoose.model('Channel', channelSchema);
 
 // Export the Model so we can use it in our controllers.

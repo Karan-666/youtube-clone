@@ -7,6 +7,7 @@ import bcrypt from "bcrypt";
 //Import jsonwebtoken for creating secure access tokens (JWT).
 import jwt from "jsonwebtoken";
 
+// logic for register
 export async function register(req, res) {
   try {
     //Destructure the data sent from the frontend in the request body.
@@ -49,6 +50,7 @@ export async function register(req, res) {
   }
 }
 
+// logic for login
 export async function login(req, res) {
   try {
     // Destructure email and password from the request body.
@@ -107,3 +109,60 @@ export async function login(req, res) {
       .json({ message: "Internal server error during login." });
   }
 }
+
+// we are making create channel function in user controller and not creating a dedicated controller as
+// channel creation is tightly attached with the user
+// Function to handle creating a new channel for the logged-in user (Protected POST)
+export async function createChannel(req, res) {
+    try {
+        // Get channel data from the request body. We only expect channelName and handle.
+        const { channelName, handle } = req.body;
+        // Get the authenticated user's ID from the JWT middleware (req.user is available).
+        const ownerId = req.user._id;
+
+        // ********************* VALIDATION: Check if user already owns a channel *********************
+
+        // Find a channel where the 'owner' ID matches the logged-in user's ID.
+        const existingChannelByUser = await ChannelModel.findOne({ owner: ownerId });
+
+        if (existingChannelByUser) {
+            // Return a 409 Conflict error if the user tries to create a second channel.
+            return res.status(409).json({ 
+                message: "User already owns a channel.",
+                channel: existingChannelByUser // Optional: returning the existing channel details.
+            });
+        }
+        
+        // ********************* VALIDATION: Check if channel handle is taken *********************
+
+        // Find a channel where the 'handle' matches the requested handle.
+        const existingChannelByHandle = await ChannelModel.findOne({ handle });
+
+        if (existingChannelByHandle) {
+            // Return a 409 Conflict error if the handle is already in use.
+            return res.status(409).json({ message: "Channel handle is already taken. Please choose another." });
+        }
+
+        // ********************* CREATE NEW CHANNEL *********************
+
+        // Create a new document in the 'channels' collection.
+        const newChannel = await ChannelModel.create({
+            channelName, 
+            handle, 
+            owner: ownerId, // Set the owner ID to the authenticated user.
+            // Other fields (subscribers, banner) will use their default values.
+        });
+
+        // Send a success response (201 Created) back to the client.
+        return res.status(201).json({ 
+            message: "Channel created successfully!",
+            channel: newChannel
+        });
+
+    } catch (error) {
+        // Handle any server or validation errors.
+        console.error("Error creating channel:", error);
+        return res.status(500).json({ message: "Internal server error during channel creation." });
+    }
+}
+
