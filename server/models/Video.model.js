@@ -51,7 +51,28 @@ const videoSchema = new mongoose.Schema({
     category: { 
         type: String,
         default: 'General',
-    }
+    },
+    comments: [
+        {
+            // The ID of the user who posted the comment (links to the 'users' collection).
+            userId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User', 
+                required: true,
+            },
+            // The actual text content of the comment.
+            text: {
+                type: String,
+                required: true,
+                maxlength: 500,
+            },
+            // The time the comment was posted.
+            timestamp: {
+                type: Date,
+                default: Date.now,
+            },
+        }
+    ],
 }, {
     // This automatically manages 'createdAt' and 'updatedAt' timestamps.
     timestamps: true 

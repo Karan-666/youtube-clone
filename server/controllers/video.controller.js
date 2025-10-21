@@ -126,3 +126,42 @@ export async function deleteVideo(req, res) {
         return res.status(500).json({ message: "Internal server error while deleting video." });
     }
 }
+
+// Function to handle adding a new comment to a specific video (Protected POST)
+export async function addComment(req, res) {
+    try {
+        // Get the video ID from the dynamic URL path.
+        const { id } = req.params; 
+        // Get the comment text from the request body.
+        const { text } = req.body;
+        // Get the authenticated user's ID from the JWT middleware.
+        const userId = req.user._id;
+
+        // Create the new comment object.
+        const newComment = {
+            userId: userId, // The ID of the user who is posting the comment.
+            text: text,     // The content of the comment.
+            timestamp: new Date() // Set the current time.
+        };
+
+        // Use $push to atomically add the new comment to the video's comments array.
+        const updatedVideo = await VideoModel.findByIdAndUpdate(
+            id,              // Find the video by its ID.
+            { $push: { comments: newComment } }, // Use $push to append to the 'comments' array.
+            { new: true }    // Return the updated video document.
+        );
+
+        // Check if the video was found and updated.
+        if (!updatedVideo) {
+            return res.status(404).json({ message: "Video not found with this ID. Cannot add comment." });
+        }
+
+        // Send a success response (200 OK) with the newly updated video document.
+        return res.status(200).json(updatedVideo);
+
+    } catch (error) {
+        // Handle any server or database errors.
+        console.error("Error adding comment:", error);
+        return res.status(500).json({ message: "Internal server error while adding comment." });
+    }
+}
