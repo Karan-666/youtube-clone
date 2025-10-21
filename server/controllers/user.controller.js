@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import UserModel from "../models/User.model.js";
+import ChannelModel from "../models/Channel.model.js";
 
 //Import bcrypt for hashing (encrypting) user passwords.
 import bcrypt from "bcrypt";
