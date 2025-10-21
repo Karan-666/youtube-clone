@@ -95,3 +95,34 @@ export async function updateVideo(req, res) {
         return res.status(500).json({ message: "Internal server error while updating video." });
     }
 }
+
+// Function to handle deleting an existing video (DELETE operation)
+export async function deleteVideo(req, res) {
+    try {
+        // Get the video ID from the dynamic URL path (req.params).
+        const { id } = req.params; 
+        
+        // for now, we will simply find and delete the video by ID.
+
+        // Use Mongoose to find the video by its ID and permanently delete it.
+        const deletedVideo = await VideoModel.findByIdAndDelete(
+            id // The ID of the document to delete.
+        );
+
+        // Check if the video was found and deleted.
+        if (!deletedVideo) {
+            return res.status(404).json({ message: "Video not found with this ID." });
+        }
+
+        // 4. Send a success response (200 OK) with a confirmation message.
+        return res.status(200).json({ 
+            message: "Video deleted successfully!",
+            deletedVideo: deletedVideo // Optional: sending the deleted document for confirmation
+        });
+
+    } catch (error) {
+        // Handle any server or database errors.
+        console.error("Error deleting video:", error);
+        return res.status(500).json({ message: "Internal server error while deleting video." });
+    }
+}
