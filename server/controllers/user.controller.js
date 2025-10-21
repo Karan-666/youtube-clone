@@ -1,5 +1,5 @@
 
-import UserModel from "../models/User.model";
+import UserModel from "../models/User.model.js";
 
 export async function register(req, res){
 
