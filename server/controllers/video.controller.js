@@ -64,3 +64,34 @@ export async function createVideo(req, res) {
         return res.status(500).json({ message: "Internal server error while creating video." });
     }
 }
+
+// Function to handle updating an existing video (PATCH operation)
+export async function updateVideo(req, res) {
+    try {
+        // Get the video ID from the dynamic URL path (req.params).
+        const { id } = req.params; 
+        
+        // we will simply find and update the video by ID.
+        // In a later step, we will add a check to ensure req.user._id matches the video's uploader ID.
+
+        // Use Mongoose to find the video by its ID and apply updates from req.body.
+        const updatedVideo = await VideoModel.findByIdAndUpdate(
+            id,              // First argument: The ID of the document to update.
+            req.body,        // Second argument: The data fields to change.
+            { new: true }    // Third argument: Return the NEW, updated document.
+        );
+
+        //  Check if the video was found and updated.
+        if (!updatedVideo) {
+            return res.status(404).json({ message: "Video not found with this ID." });
+        }
+
+        // Send a success response (200 OK) with the updated document.
+        return res.status(200).json(updatedVideo);
+
+    } catch (error) {
+        // Handle any server or database errors.
+        console.error("Error updating video:", error);
+        return res.status(500).json({ message: "Internal server error while updating video." });
+    }
+}
