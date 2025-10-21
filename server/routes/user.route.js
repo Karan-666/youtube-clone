@@ -1,4 +1,5 @@
 import { login, register } from "../controllers/user.controller.js";
+import verifyToken from "../middleware/verifyToken.js";
 
 
 function userRoutes(app){
@@ -6,7 +7,7 @@ function userRoutes(app){
     // route for registration
     // post
     // it will run register function from controller
-    app.post('/api/register', register);
+    app.post('/api/register', verifyToken,  register);
 
     // route for login
     // post
