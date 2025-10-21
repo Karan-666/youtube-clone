@@ -2,7 +2,7 @@
 
 import { createVideo } from "../controllers/video.controller.js";
 import { fetchAllVideos } from "../controllers/video.controller.js";
-import { updateVideo, deleteVideo } from "../controllers/video.controller.js";
+import { updateVideo, deleteVideo , addComment } from "../controllers/video.controller.js";
 import verifyToken from "../middleware/verifyToken.js";
 
 // This function takes the Express app object and attaches the routes to it.
@@ -22,6 +22,10 @@ function videoRoutes(app) {
 
     // Route to delete a video.
     app.delete('/api/video/:id', verifyToken, deleteVideo);
+
+    // Route to add a comment to a video (Protected POST operation).
+    // The ':id' is the video ID.
+    app.post('/api/video/:id/comment', verifyToken, addComment);
 }
 
 // Export the function so it can be imported and executed in our index.js file.
