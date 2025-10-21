@@ -10,6 +10,7 @@ import cors from "cors";
 
 // importing user routes
 import userRoutes from "./routes/user.route.js";
+import videoRoutes from "./routes/video.route.js";
 
 // the express function gives our app / main application object
 const app = express();
@@ -40,6 +41,8 @@ mongoose.connect(MONGODB_URI).then(() => {
   console.log("Db connection is successful!");
 
   userRoutes(app);
+
+  videoRoutes(app);
 
   // app.listen() method starts the server and it keeps it running.
   // it accepts port and a callback function
