@@ -8,6 +8,34 @@ import { Provider } from "react-redux";
 // importing store configuration we created
 import appStore from "./utils/appStore.js";
 
+// importing routing components
+import {createBrowserRouter, RouterProvider} from 'react-router-dom';
+
+
+// ****************************** REACT ROUTER CONFIGURATION ******************************
+
+// Define the routes for our application. 
+// It takes an array of objects.
+const appRouter = createBrowserRouter([
+  {
+    // The parent path is the root path (/)
+    path: "/",
+    // The element for the root path is the App component, which will act as the layout wrapper.
+    element: <App />, 
+    // The children array defines the components that will replace the <Outlet /> inside App.
+    children: [
+      {
+        // Path '/' (Home Page)
+        path: "/",
+        // The Body component (Sidebar + Video Grid) is the home page content.
+        element: <Body />, 
+      },
+
+    ]
+  },
+]);
+
+// ****************************** RENDER THE APPLICATION ******************************
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={appStore}>
