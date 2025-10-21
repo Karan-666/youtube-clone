@@ -28,3 +28,39 @@ export async function fetchAllVideos(req, res) {
     }
 }
 
+// Function to handle creating a new video (Upload/POST operation)
+export async function createVideo(req, res) {
+    try {
+        // Destructure all required fields from the request body.
+        const { title, description, videoUrl, thumbnailUrl, channelId, category } = req.body;
+        
+        // **IMPORTANT:** req.user contains the authenticated user's data 
+        // that was attached by the verifyToken middleware
+        // This is how we know who uploaded the video.
+        const uploaderId = req.user._id; 
+        
+        // Create a new document in the 'videos' collection.
+        // We set the 'uploader' field using the ID from the authenticated user.
+        const newVideo = await VideoModel.create({
+            title, 
+            description, 
+            videoUrl, 
+            thumbnailUrl, 
+            channelId, 
+            category,
+            uploader: uploaderId, // The ID of the authenticated user.
+        });
+
+        // Send a success response (201 Created) back to the client.
+        return res.status(201).json(newVideo);
+
+    } catch (error) {
+        // Handle any server or validation errors.
+        console.error("Error creating video:", error);
+        // Send a 400 status if the request body is missing required fields (Mongoose validation error).
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: "Validation failed. Please check all required fields." });
+        }
+        return res.status(500).json({ message: "Internal server error while creating video." });
+    }
+}
