@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar.jsx";
 import VideoCard from "./VideoCard.jsx";
 // Import the custom hook to fetch videos.
 import useFetchVideos from "../hooks/useFetchVideos.js";
+import { useSelector } from "react-redux";
 
 // Array of filter buttons (at least 6, as required by the project).
 const filterButtons = [
@@ -22,12 +23,15 @@ function Body() {
   // Call the custom hook to get the list of videos.
   const videos = useFetchVideos();
 
-  // Show a loading state if videos array is empty (or we can show the filters).
+  // getting value of isMenuOpen redux state from app slice
+  const sideBarVisibility = useSelector(store => store.app.isMenuOpen);
 
+  // Show a loading state if videos array is empty (or we can show the filters).
   return (
     // Use flex to arrange the sidebar and the main content.
     <div className="flex mt-14">
-      <Sidebar />
+      {/* Conditionally render the Sidebar based on Redux state. */}
+      {sideBarVisibility?<Sidebar /> : null}
 
       {/* The main content area takes up the remaining space (Video Filters + Grid). */}
       <div className="p-4 grow">
