@@ -8,6 +8,8 @@ import { IoClose } from "react-icons/io5";
 // axios for api calls
 import axios from "axios";
 
+import {useDispatch} from "react-redux";
+
 // This component will be passed visibility and close handlers as props
 function AuthModal({ isVisible, onClose }) {
   // State to toggle between the Login and Register views.
@@ -29,6 +31,8 @@ function AuthModal({ isVisible, onClose }) {
     setEmail("");
     setPassword("");
   };
+
+  const dispatch = useDispatch();
 
   // Placeholder for the form submission logic (login/register API calls).
   async function handleSubmit(e) {
@@ -83,6 +87,12 @@ function AuthModal({ isVisible, onClose }) {
           // saving token to local storage
           localStorage.setItem("token", res.data.accessToken);
           localStorage.setItem("username", res.data.user.username);
+
+          //Dispatch the login action to Redux.
+          dispatch(loginUser({
+            accessToken: res.data.accessToken,
+            username: res.data.user.username,
+          }));
 
           alert(`Welcome back, ${res.data.user.username}!`);
 
