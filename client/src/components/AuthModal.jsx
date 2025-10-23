@@ -42,8 +42,6 @@ function AuthModal({ isVisible, onClose }) {
     // If in the Register view:
     if (!isLogin) {
       try {
-        async function callRegisterApi() {
-          // creating body for post
           const payload = {
             username,
             email,
@@ -61,9 +59,7 @@ function AuthModal({ isVisible, onClose }) {
             setIsLogin(true); // Switch to the Login view.
             resetForm();
           }
-        }
 
-        callRegisterApi();
       } catch (error) {
         // Handle errors (e.g 409 Conflict if email already exists).
         const message =
