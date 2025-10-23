@@ -10,7 +10,8 @@ function userRoutes(app) {
   // route for registration
   // post
   // it will run register function from controller
-  app.post("/api/register", verifyToken, register);
+  // app.post("/api/register", verifyToken, register);
+    app.post("/api/register",  register);
 
   // route for login
   // post

@@ -1,14 +1,18 @@
 // AuthModal.jsx - Handles the Login and Registration forms.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // We use useNavigate to redirect the user after a successful login/registration.
 import { useNavigate } from "react-router-dom";
 // We use a simple icon for the close button.
 import { IoClose } from "react-icons/io5";
+// axios for api calls
+import axios from "axios";
 
 // This component will be passed visibility and close handlers as props
 function AuthModal({ isVisible, onClose }) {
   // State to toggle between the Login and Register views.
+  // if isLogin is true -> user in login state
+  // if isLogin is false -> user in register state
   const [isLogin, setIsLogin] = useState(true);
 
   // State to handle the controlled input fields (Username, Email, Password).
@@ -27,15 +31,75 @@ function AuthModal({ isVisible, onClose }) {
   };
 
   // Placeholder for the form submission logic (login/register API calls).
-  const handleSubmit = (e) => {
+  async function handleSubmit(e) {
     e.preventDefault(); // Stop the form from causing a page reload.
     console.log(`Submitting as ${isLogin ? "Login" : "Register"}:`, {
       username,
       email,
       password,
     });
-    // The real API call logic will go here next.
-  };
+
+    // If in the Register view:
+    if (!isLogin) {
+      try {
+        async function callRegisterApi() {
+          // creating body for post
+          const payload = {
+            username,
+            email,
+            password,
+          };
+          const res = await axios.post(
+            "http://localhost:8080/api/register",
+            payload
+          );
+
+          // Check for success (status 201 Created from backend).
+          if (res.status === 201) {
+            // Successful registration: show alert, switch to login view, and reset form.
+            alert("Registration successful! Please sign in now.");
+            setIsLogin(true); // Switch to the Login view.
+            resetForm();
+          }
+        }
+
+        callRegisterApi();
+      } catch (error) {
+        // Handle errors (e.g 409 Conflict if email already exists).
+        const message =
+          error.response?.data?.message ||
+          "Registration failed. Check server status.";
+        alert(`Registration Failed: ${message}`);
+      }
+    } else {
+      // Login logic
+      console.log("Attempting Login...");
+
+      try {
+        const payload = { email, password };
+
+        const res = await axios.post(
+          "http://localhost:8080/api/login",
+          payload
+        );
+
+        if (res.status === 200) {
+          // saving token to local storage
+          localStorage.setItem("token", res.data.accessToken);
+          localStorage.setItem("username", res.data.user.username);
+
+          alert(`Welcome back, ${res.data.user.username}!`);
+
+          onClose();
+          resetForm();
+        }
+      } catch (error) {
+        const message =
+          error.response?.data?.message || "Login failed. Check server status.";
+        alert(`Login Failed: ${message}`);
+      }
+    }
+  }
 
   // If the modal is not visible, return null so it doesn't render anything.
   if (!isVisible) return null;
