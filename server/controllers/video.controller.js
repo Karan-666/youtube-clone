@@ -165,3 +165,28 @@ export async function addComment(req, res) {
         return res.status(500).json({ message: "Internal server error while adding comment." });
     }
 }
+
+// Function to handle fetching details for a single video by ID (Public GET)
+export async function fetchVideoDetails(req, res) {
+    try {
+        // Get the video ID from the dynamic URL path.
+        const { id } = req.params; 
+        
+        // Use Mongoose to find ONE video document by its unique ID.
+        const video = await VideoModel.findById(id); 
+
+        // Check if the video was found.
+        if (!video) {
+            return res.status(404).json({ message: "Video not found with this ID." });
+        }
+
+        // Send a success response (200 OK) with the video details.
+        return res.status(200).json(video);
+
+    } catch (error) {
+        // Handle any server or invalid ID errors.
+        console.error("Error fetching video details:", error);
+        // This handles cases where the ID format is invalid (Mongoose CastError).
+        return res.status(400).json({ message: "Invalid video ID format." });
+    }
+}

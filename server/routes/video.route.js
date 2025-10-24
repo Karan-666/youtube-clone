@@ -1,6 +1,6 @@
 // video.route.js
 
-import { createVideo } from "../controllers/video.controller.js";
+import { createVideo, fetchVideoDetails } from "../controllers/video.controller.js";
 import { fetchAllVideos } from "../controllers/video.controller.js";
 import { updateVideo, deleteVideo , addComment } from "../controllers/video.controller.js";
 import verifyToken from "../middleware/verifyToken.js";
@@ -11,6 +11,10 @@ function videoRoutes(app) {
   // get
   // This is a READ operation, so it does NOT need JWT protection.
   app.get("/api/videos", fetchAllVideos);
+
+  //Route to fetch details for a single video (Public GET operation).
+    // This uses the same URL structure as the protected update/delete routes, but is a GET request.
+    app.get('/api/video/:id', fetchVideoDetails);
 
   //Route to create a new video
   // The request must pass through verifyToken before it hits the createVideo function.
