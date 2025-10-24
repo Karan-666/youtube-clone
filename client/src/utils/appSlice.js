@@ -10,6 +10,7 @@ const appSlice = createSlice({
   // Initial state object. Sidebar starts as visible (true).
   initialState: {
     isMenuOpen: true,
+    // we need search state in redux as filter is in header but filtering logic is in body
     searchQuery: "",
   },
 
@@ -23,9 +24,14 @@ const appSlice = createSlice({
     closeMenu: (state) => {
       state.isMenuOpen = false;
     },
+    // Reducer to update the search query state.
+    setSearchQuery : (state, action) => {
+      state.searchQuery = action.payload;
+    }
+
   },
 });
 
 // Export the actions and the reducer (for the store).
-export const { toggleMenu, closeMenu } = appSlice.actions;
+export const { toggleMenu, closeMenu , setSearchQuery} = appSlice.actions;
 export default appSlice.reducer;

@@ -9,6 +9,7 @@ import AuthModal from "./AuthModal";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleMenu } from "../utils/appSlice.js";
 import { logoutUser } from "../utils/userSlice.js";
+  import { setSearchQuery } from "../utils/appSlice.js";
 
 function Header() {
   // Local state to control whether the Sign-in Modal is visible (false = hidden initially).
@@ -19,6 +20,9 @@ function Header() {
 
   // Subscribe to the user slice state.
   const { isLoggedIn, username } = useSelector((store) => store.user);
+ // Subscribe to retrieve the search query
+  const searchQuery = useSelector(store => store.app.searchQuery);
+
 
   //Function to handle the sidebar toggle click.
   function handleMenuToggle() {
@@ -31,10 +35,17 @@ function Header() {
   }
 
   // Logout handler (for later use).
-  const handleLogout = () => {
+  function handleLogout(){
     // Dispatches the logout action, which clears Redux state and localStorage.
     dispatch(logoutUser());
   };
+
+  function handleSearchInput(e){
+    // The Redux State is Always One Step Behind
+    // if we type YT, Redux state still holds the old value: 'Y'.
+    // that's why we need e.target.value to set current value and make it a controlled input
+    dispatch(setSearchQuery(e.target.value));
+  }
 
   return (
     // The main header container, fixed height, white background, flex layout for organization.
@@ -65,6 +76,8 @@ function Header() {
           placeholder="Search"
           // Styling the input field: wide, rounded left corner, gray border, padding
           className="w-1/2 p-2 border border-gray-400 rounded-l-full focus:outline-none focus:ring-1 focus:ring-blue-600"
+          value={searchQuery}
+          onChange={handleSearchInput}
         />
         <button
           // Styling the button: border, gray background, rounded right corner, padding

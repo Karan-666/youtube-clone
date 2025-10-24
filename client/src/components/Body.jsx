@@ -19,9 +19,22 @@ const filterButtons = [
   "Live",
 ];
 
+
+
 function Body() {
+
+  const searchQuery = useSelector(store => store.app.searchQuery);
+
   // Call the custom hook to get the list of videos.
   const videos = useFetchVideos();
+
+  // .filter() creates a new array containing only elements that pass the test.
+  const filteredVideos = videos.filter(
+    // Check if the video title includes the search query 
+    (item)=>{
+      return item.title.toLowerCase().includes(searchQuery.toLowerCase());
+    }
+  )
 
   // getting value of isMenuOpen redux state from app slice
   const sideBarVisibility = useSelector(store => store.app.isMenuOpen);
@@ -59,13 +72,13 @@ function Body() {
         {/* Video Grid Container */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-8 gap-x-4">
           {/* Show a message if no videos are available yet. */}
-          {videos.length === 0 ? (
+          {filteredVideos.length === 0 ? (
             <h2 className="col-span-full text-center text-xl font-medium text-gray-500 pt-10">
               Loading videos or no videos found...
             </h2>
           ) : (
             // Map through the fetched videos and render a VideoCard for each.
-            videos.map((video) => <VideoCard key={video._id} video={video} />)
+            filteredVideos.map((video) => <VideoCard key={video._id} video={video} />)
           )}
         </div>
       </div>
