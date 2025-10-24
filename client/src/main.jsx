@@ -11,6 +11,7 @@ import appStore from "./utils/appStore.js";
 // importing routing components
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import Body from "./components/Body.jsx";
+import VideoPlayerPage from "./components/VideoPlayerPage.jsx";
 
 
 // ****************************** REACT ROUTER CONFIGURATION ******************************
@@ -30,6 +31,12 @@ const appRouter = createBrowserRouter([
         path: "/",
         // The Body component (Sidebar + Video Grid) is the home page content.
         element: <Body />, 
+      },
+      {
+        // Dynamic route for the Video Player Page.
+        path: "watch/:videoId",
+        // The video player page component
+        element: <VideoPlayerPage/> , 
       },
 
     ]
