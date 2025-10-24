@@ -6,8 +6,9 @@ import { GoUpload } from "react-icons/go"; // Icon for uploading a video (placeh
 import { Link } from "react-router-dom"; // We'll need Link for the Sign-in button
 import React, { useState } from "react"; // Import useState for modal visibility
 import AuthModal from "./AuthModal";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toggleMenu } from "../utils/appSlice.js";
+import { logoutUser } from "../utils/userSlice.js";
 
 function Header() {
   // Local state to control whether the Sign-in Modal is visible (false = hidden initially).
@@ -15,6 +16,9 @@ function Header() {
 
   // Hook to allow sending actions to the Redux store (used for sidebar toggle).
   const dispatch = useDispatch();
+
+  // Subscribe to the user slice state.
+  const { isLoggedIn, username } = useSelector((store) => store.user);
 
   //Function to handle the sidebar toggle click.
   function handleMenuToggle() {
@@ -25,6 +29,12 @@ function Header() {
   function handleSignInClick() {
     setShowAuthModal(true);
   }
+
+  // Logout handler (for later use).
+  const handleLogout = () => {
+    // Dispatches the logout action, which clears Redux state and localStorage.
+    dispatch(logoutUser());
+  };
 
   return (
     // The main header container, fixed height, white background, flex layout for organization.
@@ -65,27 +75,53 @@ function Header() {
         </button>
       </div>
 
-      {/* Right Section: User Icons and Sign-in Button */}
+      {/* Right Section: Conditional Rendering */}
       <div className="flex items-center space-x-5">
-        {/* Placeholder icons for logged-in user actions (Will be conditionally rendered later) */}
-        <GoUpload className="text-2xl cursor-pointer text-gray-600 hover:text-gray-800" />
-        <IoMdNotificationsOutline className="text-2xl cursor-pointer text-gray-600 hover:text-gray-800" />
+        {isLoggedIn ? (
+          // Logged In View
+          <>
+            <GoUpload className="text-2xl cursor-pointer text-gray-600 hover:text-gray-800" />
+            <IoMdNotificationsOutline className="text-2xl cursor-pointer text-gray-600 hover:text-gray-800" />
 
-        {/* Attach handleSignInClick to the button. */}
-        <button
-          onClick={handleSignInClick}
-          className="flex items-center px-3 py-1 text-blue-600 border border-blue-600 rounded-full hover:bg-blue-50 transition-colors"
-        >
-          <FaUserCircle className="text-xl mr-2" />
-          <span className="font-medium text-sm">Sign in</span>
-        </button>
+            {/* User Profile/Name Display */}
+            <div className="flex items-center space-x-1 cursor-pointer group">
+              {/* Placeholder for Avatar/User Circle */}
+              <FaUserCircle className="text-3xl text-gray-700" />
+              {/* Display the username from Redux state */}
+              <span className="text-sm font-medium text-gray-800 hidden md:inline">
+                {username}
+              </span>
+
+              {/* Logout button for testing purposes */}
+              <button
+                onClick={handleLogout}
+                className="text-xs text-red-500 hover:text-red-700 ml-3"
+              >
+                (Logout)
+              </button>
+            </div>
+          </>
+        ) : (
+          // Logged Out View (Original Sign In Button)
+          <>
+            <GoUpload className="text-2xl cursor-pointer text-gray-200" />{" "}
+            {/* Hide/disable upload icon */}
+            <IoMdNotificationsOutline className="text-2xl cursor-pointer text-gray-200" />{" "}
+            {/* Hide/disable notification icon */}
+            <button
+              onClick={handleSignInClick}
+              className="flex items-center px-3 py-1 text-blue-600 border border-blue-600 rounded-full hover:bg-blue-50 transition-colors"
+            >
+              <FaUserCircle className="text-xl mr-2" />
+              <span className="font-medium text-sm">Sign in</span>
+            </button>
+          </>
+        )}
       </div>
 
-      {/* Render the AuthModal at the end of the component's JSX. */}
-      {/* The modal is rendered but hidden if showAuthModal is false. */}
+      {/* AuthModal Render */}
       <AuthModal
         isVisible={showAuthModal}
-        // This function allows the modal's internal close button to update the state here.
         onClose={() => setShowAuthModal(false)}
       />
     </div>

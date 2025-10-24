@@ -10,6 +10,7 @@ const appSlice = createSlice({
   // Initial state object. Sidebar starts as visible (true).
   initialState: {
     isMenuOpen: true,
+    searchQuery: "",
   },
 
   // Reducer functions define how the state can be updated.

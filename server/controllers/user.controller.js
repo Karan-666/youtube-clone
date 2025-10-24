@@ -83,7 +83,7 @@ export async function login(req, res) {
 
     // payload here = unique data we want to store (user id)
     const payload = {
-      id: existingUser._id,
+      id: existingUser._id.toString(),
     };
 
     // Create the token using the user ID payload and a secret key.
@@ -96,7 +96,7 @@ export async function login(req, res) {
     return res.status(200).json({
       message: "Login successful!",
       user: {
-        id: existingUser._id,
+        id: existingUser._id.toString(),
         username: existingUser.username,
         email: existingUser.email,
       },

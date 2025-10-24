@@ -8,7 +8,9 @@ import { IoClose } from "react-icons/io5";
 // axios for api calls
 import axios from "axios";
 
-import {useDispatch} from "react-redux";
+import {loginUser} from "../utils/userSlice.js"
+
+import { useDispatch } from "react-redux";
 
 // This component will be passed visibility and close handlers as props
 function AuthModal({ isVisible, onClose }) {
@@ -46,24 +48,23 @@ function AuthModal({ isVisible, onClose }) {
     // If in the Register view:
     if (!isLogin) {
       try {
-          const payload = {
-            username,
-            email,
-            password,
-          };
-          const res = await axios.post(
-            "http://localhost:8080/api/register",
-            payload
-          );
+        const payload = {
+          username,
+          email,
+          password,
+        };
+        const res = await axios.post(
+          "http://localhost:8080/api/register",
+          payload
+        );
 
-          // Check for success (status 201 Created from backend).
-          if (res.status === 201) {
-            // Successful registration: show alert, switch to login view, and reset form.
-            alert("Registration successful! Please sign in now.");
-            setIsLogin(true); // Switch to the Login view.
-            resetForm();
-          }
-
+        // Check for success (status 201 Created from backend).
+        if (res.status === 201) {
+          // Successful registration: show alert, switch to login view, and reset form.
+          alert("Registration successful! Please sign in now.");
+          setIsLogin(true); // Switch to the Login view.
+          resetForm();
+        }
       } catch (error) {
         // Handle errors (e.g 409 Conflict if email already exists).
         const message =
@@ -72,38 +73,48 @@ function AuthModal({ isVisible, onClose }) {
         alert(`Registration Failed: ${message}`);
       }
     } else {
-      // Login logic
-      console.log("Attempting Login...");
-
       try {
         const payload = { email, password };
 
+        // Execute API call and wait for response.
         const res = await axios.post(
           "http://localhost:8080/api/login",
           payload
         );
 
+        // CHECK STATUS AND PROCESS SUCCESS: This block ONLY runs if status is 200-299.
         if (res.status === 200) {
-          // saving token to local storage
+          // Update Local Storage
           localStorage.setItem("token", res.data.accessToken);
           localStorage.setItem("username", res.data.user.username);
 
-          //Dispatch the login action to Redux.
-          dispatch(loginUser({
-            accessToken: res.data.accessToken,
-            username: res.data.user.username,
-          }));
+          // Dispatch to Redux
+          dispatch(
+            
+            loginUser({
+              accessToken: res.data.accessToken,
+              username: res.data.user.username,
+            })
+          );
 
           alert(`Welcome back, ${res.data.user.username}!`);
 
+          // Close UI
           onClose();
           resetForm();
+          return; // Exit the function after success
         }
+
+        // Note: axios typically throws an error for 4xx/5xx status codes,
+        // so this 'if' block handles only the true success path.
       } catch (error) {
+        // 3. CATCH FAILURE: This block runs for bad passwords (401) or server crashes (500).
         const message =
           error.response?.data?.message || "Login failed. Check server status.";
         alert(`Login Failed: ${message}`);
       }
+
+      // ****************************** LOGIN LOGIC END ******************************
     }
   }
 
