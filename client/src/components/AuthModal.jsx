@@ -87,6 +87,8 @@ function AuthModal({ isVisible, onClose }) {
           // Update Local Storage
           localStorage.setItem("token", res.data.accessToken);
           localStorage.setItem("username", res.data.user.username);
+          // Store the unique user ID to localStorage for owner checks.
+          localStorage.setItem("userId", res.data.user.id);
 
           // Dispatch to Redux
           dispatch(
@@ -94,6 +96,7 @@ function AuthModal({ isVisible, onClose }) {
             loginUser({
               accessToken: res.data.accessToken,
               username: res.data.user.username,
+              userId: res.data.user.id,
             })
           );
 

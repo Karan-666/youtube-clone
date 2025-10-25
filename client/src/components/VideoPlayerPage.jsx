@@ -151,6 +151,8 @@ function VideoPlayerPage() {
                                 <CommentCard 
                                     key={comment.userId + index} 
                                     comment={comment} 
+                                    videoId={videoId}           // 1. NEW: Pass the video ID to the CommentCard.
+                                    onDelete={handleCommentAdded} // 2. NEW: Pass the refetch trigger for deletion.
                                 />
                             ))}
                             
