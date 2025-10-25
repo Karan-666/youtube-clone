@@ -5,6 +5,10 @@ import useFetchVideoDetail from "../hooks/useFetchVideoDetails.js"
 // Import icons for interaction buttons.
 import { AiOutlineLike, AiOutlineDislike, AiOutlineShareAlt, AiOutlineDownload } from 'react-icons/ai';
 
+import CommentCard from './CommentCard.jsx';
+
+import AddCommentForm from './AddCommentForm.jsx';
+
 function VideoPlayerPage() {
 
     // Extract the 'videoId' from the URL path (e.g., /watch/videoId).
@@ -117,10 +121,30 @@ function VideoPlayerPage() {
                         <p>{videoDetails.description}</p>
                     </div>
 
-                    {/* Placeholder for Comment Section (UNCHANGED) */}
+                    {/* Comment Section - Reading Existing Comments */}
                     <div className="border-t pt-4">
-                        <h3 className="text-lg font-bold mb-3">Comments ({videoDetails.comments?.length || 0})</h3>
-                        {/* The comment list component will be placed here next. */}
+                        <h3 className="text-lg font-bold mb-3">
+                            Comments ({videoDetails.comments?.length || 0})
+                        </h3>
+
+                        {/* 3. NEW: Place the form component here, passing the video ID. */}
+                        {/* The onCommentAdded prop will be used later to trigger a refetch. */}
+                        <AddCommentForm videoId={videoId} onCommentAdded={() => { console.log('Comment added!'); }} />
+                        
+                        <div className="space-y-4">
+                            {/* 3. Map over the comments array embedded in the video document. */}
+                            {videoDetails.comments && videoDetails.comments.map((comment, index) => (
+                                // Use a combination of user ID and index as a unique key for list rendering.
+                                <CommentCard 
+                                    key={comment.userId + index} 
+                                    comment={comment} 
+                                />
+                            ))}
+                            
+                            {videoDetails.comments?.length === 0 && (
+                                <p className="text-sm text-gray-500">Be the first to comment!</p>
+                            )}
+                        </div>
                     </div>
                 </div>
 
