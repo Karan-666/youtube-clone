@@ -1,21 +1,30 @@
 // Displays the main video player, comments, and suggested videos.
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {useParams} from "react-router-dom";
 import useFetchVideoDetail from "../hooks/useFetchVideoDetails.js"
 // Import icons for interaction buttons.
 import { AiOutlineLike, AiOutlineDislike, AiOutlineShareAlt, AiOutlineDownload } from 'react-icons/ai';
 
 import CommentCard from './CommentCard.jsx';
-
 import AddCommentForm from './AddCommentForm.jsx';
 
 function VideoPlayerPage() {
+
+    // 2. NEW: State variable used to force the custom hook to re-run.
+    const [refetchTrigger, setRefetchTrigger] = useState(0);
 
     // Extract the 'videoId' from the URL path (e.g., /watch/videoId).
     const {videoId} = useParams();
 
    // Call the custom hook to fetch the video details using the ID.
-    const videoDetails = useFetchVideoDetail(videoId);
+    const videoDetails = useFetchVideoDetail(videoId, refetchTrigger);
+
+    // 4. Function called by the AddCommentForm upon successful submission.
+    function handleCommentAdded(){
+        // Incrementing the state value forces the component (and thus the hook) to re-render and refetch.
+        setRefetchTrigger(prev => prev + 1); 
+        console.log('Refetch triggered. The comments array will now refresh.');
+    };
 
     
     // Handle Loading State: If data is null, show a loading message.
@@ -129,7 +138,11 @@ function VideoPlayerPage() {
 
                         {/* 3. NEW: Place the form component here, passing the video ID. */}
                         {/* The onCommentAdded prop will be used later to trigger a refetch. */}
-                        <AddCommentForm videoId={videoId} onCommentAdded={() => { console.log('Comment added!'); }} />
+                        {/* 5. Pass the handleCommentAdded function to the form component. */}
+                        <AddCommentForm 
+                            videoId={videoId} 
+                            onCommentAdded={handleCommentAdded} // NEW: The form calls this function on success.
+                        />
                         
                         <div className="space-y-4">
                             {/* 3. Map over the comments array embedded in the video document. */}
