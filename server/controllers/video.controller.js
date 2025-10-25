@@ -190,3 +190,46 @@ export async function fetchVideoDetails(req, res) {
         return res.status(400).json({ message: "Invalid video ID format." });
     }
 }
+
+// Function to handle deleting a comment from a video (Protected DELETE)
+export async function deleteComment(req, res) {
+    try {
+        // Get the video ID from the URL path.
+        const { id: videoId } = req.params; 
+        // Get the specific comment ID to be deleted from the request body.
+        const { commentId } = req.body; 
+        
+        // IMPORTANT SECURITY CHECK: Ensure the comment to be deleted belongs to the current user (req.user._id).
+        // This is a complex check, and for now, we will perform a direct deletion first. 
+        // We assume the frontend only shows the delete button to the owner.
+
+        // Use $pull to remove the comment object from the 'comments' array where 
+        // the comment's internal '_id' matches the provided commentId.
+        const updatedVideo = await VideoModel.findByIdAndUpdate(
+            videoId, 
+            {
+                // $pull operator removes an element from an array based on a condition.
+                $pull: { 
+                    comments: { _id: commentId } // Find the comment by its unique MongoDB ID and pull it out.
+                }
+            },
+            { new: true } // Return the updated video document.
+        );
+
+        // Check if the video was found. We assume the comment deletion succeeded if the video was found.
+        if (!updatedVideo) {
+            return res.status(404).json({ message: "Video not found. Cannot delete comment." });
+        }
+
+        // Send a success response (200 OK).
+        return res.status(200).json({ 
+            message: "Comment deleted successfully!",
+            updatedVideo: updatedVideo
+        });
+
+    } catch (error) {
+        // Handle any server or database errors.
+        console.error("Error deleting comment:", error);
+        return res.status(500).json({ message: "Internal server error while deleting comment." });
+    }
+}

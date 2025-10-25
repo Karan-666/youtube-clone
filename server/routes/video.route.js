@@ -1,6 +1,6 @@
 // video.route.js
 
-import { createVideo, fetchVideoDetails } from "../controllers/video.controller.js";
+import { createVideo, deleteComment, fetchVideoDetails } from "../controllers/video.controller.js";
 import { fetchAllVideos } from "../controllers/video.controller.js";
 import { updateVideo, deleteVideo , addComment } from "../controllers/video.controller.js";
 import verifyToken from "../middleware/verifyToken.js";
@@ -30,6 +30,10 @@ function videoRoutes(app) {
     // Route to add a comment to a video (Protected POST operation).
     // The ':id' is the video ID.
     app.post('/api/video/:id/comment', verifyToken, addComment);
+
+    //Route to delete a comment from a video (Protected DELETE operation).
+    // The ':id' is the video ID. The comment ID is passed in req.body.
+    app.delete('/api/video/:id/comment', verifyToken, deleteComment);
 }
 
 // Export the function so it can be imported and executed in our index.js file.
