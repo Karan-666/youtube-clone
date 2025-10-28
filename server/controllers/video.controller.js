@@ -233,3 +233,47 @@ export async function deleteComment(req, res) {
         return res.status(500).json({ message: "Internal server error while deleting comment." });
     }
 }
+
+// Function to handle editing an existing comment (Protected PATCH)
+export async function editComment(req, res) {
+    try {
+        // 1. Get the video ID from the URL path.
+        const { id: videoId } = req.params; 
+        // 2. Get the comment ID and the new text from the request body.
+        const { commentId, newText } = req.body; 
+        
+        // 3. Use findOneAndUpdate with the Positional Operator ($).
+        // This query finds the video by ID AND finds the comment to be updated.
+        // It's crucial for atomic updates within nested arrays.
+        const updatedVideo = await VideoModel.findOneAndUpdate(
+            // Query: Find the video with this ID and where the comments array contains a document 
+            // with the specified commentId.
+            { _id: videoId, "comments._id": commentId },
+            {
+                // $set operator is used with the positional operator ($).
+                // $ tells MongoDB: "Update the element you just found in the comments array."
+                $set: { 
+                    "comments.$.text": newText, // Update only the 'text' field of the found comment.
+                    "comments.$.timestamp": new Date() // Optionally update the timestamp to reflect the edit time.
+                }
+            },
+            { new: true } // Return the updated video document.
+        );
+
+        // 4. Check if the video/comment was found and updated.
+        if (!updatedVideo) {
+            return res.status(404).json({ message: "Video or Comment not found/authorized for editing." });
+        }
+
+        // 5. Send a success response (200 OK).
+        return res.status(200).json({ 
+            message: "Comment updated successfully!",
+            updatedVideo: updatedVideo
+        });
+
+    } catch (error) {
+        // 6. Handle any server or database errors.
+        console.error("Error editing comment:", error);
+        return res.status(500).json({ message: "Internal server error while editing comment." });
+    }
+}
