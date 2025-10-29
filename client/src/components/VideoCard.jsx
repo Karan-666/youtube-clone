@@ -3,9 +3,15 @@
 // We will use the Link component to make the entire card clickable, leading to the Video Player Page.
 import { Link } from 'react-router-dom';
 
+import axios from 'axios';
+import { useSelector } from 'react-redux';
+
 // The component takes a prop named 'video', which is a single video object from the API.
 // We are using prop destructuring
-function VideoCard({ video }) {
+function VideoCard({ video, isChannelView, isOwner, onEdit, onRefetch }) {
+
+    // 1. NEW: Get token for authorized deletion.
+    const token = useSelector((store) => store.user.token);
 
     // Simple function to format large numbers (e.g 15200 views -> 15.2K views)
     const formatViews = (views) => {
@@ -16,6 +22,24 @@ function VideoCard({ video }) {
             return (views / 1000).toFixed(1) + 'K views';
         }
         return views + ' views';
+    };
+
+    // 2. NEW: Function to handle video deletion.
+    const handleDelete = async () => {
+        if (!window.confirm(`Are you sure you want to delete the video: "${video.title}"?`)) {
+            return;
+        }
+
+        try {
+            await axios.delete(`http://localhost:8080/api/video/${video._id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            alert('Video deleted successfully.');
+            onRefetch(); // Trigger the parent component to refresh the list.
+        } catch (error) {
+            console.error('Video deletion failed:', error.response?.data);
+            alert(`Deletion Failed: ${error.response?.data?.message || 'Unauthorized or server error.'}`);
+        }
     };
 
     return (
@@ -44,16 +68,33 @@ function VideoCard({ video }) {
                         {video.title}
                     </h3>
 
-                    {/* Channel Name  */}
-                    <p className="text-sm text-gray-600 mt-1">
-                        Channel Name Placeholder 
-                    </p>
+                    {/* Owner Actions (NEW) - Visible ONLY on the Channel Page for the owner */}
+                    {isChannelView && isOwner && (
+                        <div className="flex space-x-3 mt-1 text-xs text-gray-500">
+                            {/* Edit Button opens the modal for the current video data. */}
+                            <button 
+                                onClick={(e) => { e.preventDefault(); onEdit(video); }}
+                                className="hover:text-blue-600 font-medium"
+                            >
+                                Edit
+                            </button>
+                            {/* Delete Button calls the deletion API. */}
+                            <button 
+                                onClick={(e) => { e.preventDefault(); handleDelete(); }}
+                                className="hover:text-red-600 font-medium"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    )}
                     
-                    {/* Views and Upload Time (Example using the formatted view count) */}
-                    <p className="text-xs text-gray-500">
-                        {formatViews(video.views)} • 1 day ago {/* Time is hardcoded for now */}
-                    </p>
-                    
+                    {/* Standard Info - Only visible if NOT in Channel View (or if user is not owner) */}
+                    {!isChannelView && (
+                        <>
+                            <p className="text-sm text-gray-600 mt-1">Channel Name Placeholder</p>
+                            <p className="text-xs text-gray-500">{formatViews(video.views)} • 1 day ago</p>
+                        </>
+                    )}
                 </div>
             </div>
         </Link>

@@ -1,0 +1,55 @@
+// useFetchChannelVideos.js - Custom hook to fetch all videos uploaded by a specific channel owner.
+
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+// 1. We import the hook we just created to get the channel's owner ID.
+import useFetchChannelDetails from './useFetchChannelDetails';
+
+// This hook requires the channel handle to find the owner.
+const useFetchChannelVideos = (channelHandle , refetchTrigger) => {
+    const [channelVideos, setChannelVideos] = useState(null);
+    
+    // 2. We use the channel details hook to get the owner's details first.
+    const { channelDetails } = useFetchChannelDetails(channelHandle);
+
+    // 3. useEffect runs when channelDetails becomes available.
+    useEffect(() => {
+        // Only proceed if channel details have been successfully loaded and an owner ID exists.
+        if (!channelDetails || !channelDetails.owner) {
+            // Set to empty array if no owner ID is found or details are still loading.
+            setChannelVideos([]); 
+            return;
+        }
+
+        const fetchVideos = async () => {
+            try {
+                // IMPORTANT: We will use the existing fetchAllVideos endpoint and rely on 
+                // the frontend to filter by the owner's ID for simplicity and speed.
+                const API_URL = 'http://localhost:8080/api/videos';
+                
+                const response = await axios.get(API_URL);
+
+                if (response.data && response.data.length > 0) {
+                    // Filter the video list to include ONLY videos where uploader ID matches the channel owner ID.
+                    const filtered = response.data.filter(video => 
+                        video.uploader === channelDetails.owner
+                    );
+                    setChannelVideos(filtered);
+                } else {
+                    setChannelVideos([]);
+                }
+            } catch (error) {
+                console.error("Failed to fetch channel videos:", error.message);
+                setChannelVideos([]);
+            }
+        };
+
+        fetchVideos();
+    // Re-run whenever the handle changes or the channelDetails object is updated.
+    }, [channelDetails , refetchTrigger]); 
+
+    // 4. Return the list of videos.
+    return channelVideos;
+};
+
+export default useFetchChannelVideos;

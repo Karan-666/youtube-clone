@@ -22,7 +22,7 @@ function videoRoutes(app) {
 
   // Route to update an existing video (Protected Update/PATCH operation).
     // The ':id' is a dynamic parameter that captures the video ID from the URL.
-    app.patch('/api/video/:id', verifyToken, updateVideo);
+    app.post('/api/video/:id/edit', verifyToken, updateVideo);
 
     // Route to delete a video.
     app.delete('/api/video/:id', verifyToken, deleteVideo);
