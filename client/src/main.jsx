@@ -9,37 +9,42 @@ import { Provider } from "react-redux";
 import appStore from "./utils/appStore.js";
 
 // importing routing components
-import {createBrowserRouter, RouterProvider} from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Body from "./components/Body.jsx";
 import VideoPlayerPage from "./components/VideoPlayerPage.jsx";
-
+import ChannelPage from "./components/ChannelPage.jsx";
 
 // ****************************** REACT ROUTER CONFIGURATION ******************************
 
-// Define the routes for our application. 
+// Define the routes for our application.
 // It takes an array of objects.
 const appRouter = createBrowserRouter([
   {
     // The parent path is the root path (/)
     path: "/",
     // The element for the root path is the App component, which will act as the layout wrapper.
-    element: <App />, 
+    element: <App />,
     // The children array defines the components that will replace the <Outlet /> inside App.
     children: [
       {
         // Path '/' (Home Page)
         path: "/",
         // The Body component (Sidebar + Video Grid) is the home page content.
-        element: <Body />, 
+        element: <Body />,
       },
       {
         // Dynamic route for the Video Player Page.
         path: "watch/:videoId",
         // The video player page component
-        element: <VideoPlayerPage/> , 
+        element: <VideoPlayerPage />,
       },
-
-    ]
+      // 2. NEW: Dynamic route for the Channel Page.
+      // The ':handle' segment captures the channel's unique handle.
+      {
+        path: "channel/:handle",
+        element: <ChannelPage />,
+      },
+    ],
   },
 ]);
 
