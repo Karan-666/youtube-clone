@@ -25,7 +25,14 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-    }
+    },
+    // Field to track user interactions (videos they've liked or disliked).
+    interactions: {
+        // An object where the key is the video ID, and the value is the action ('like' or 'dislike').
+        // We set the type as a Schema.Types.Mixed to allow flexible key-value storage.
+        type: mongoose.Schema.Types.Mixed,
+        default: {} // Initialize as an empty object.
+    },
 }, {
     // This option automatically adds 'createdAt' and 'updatedAt' fields to our documents.
     timestamps: true 

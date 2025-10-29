@@ -3,11 +3,17 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+// 1. NEW: Import useSelector to access Redux state.
+import { useSelector } from 'react-redux';
+
 // The hook accepts the unique handle of the channel it needs to fetch.
 const useFetchChannelDetails = (channelHandle) => {
     
     // 1. State to hold the single channel document. Starts as null while loading.
     const [channelDetails, setChannelDetails] = useState(null);
+
+    // 2. NEW: Get the logged-in user's ID from Redux state.
+    const loggedInUserId = useSelector((store) => store.user.userId);
     
     // 2. useEffect runs whenever the component mounts OR the channelHandle changes.
     useEffect(() => {
@@ -40,8 +46,11 @@ const useFetchChannelDetails = (channelHandle) => {
     // 3. The dependency array includes channelHandle. The hook reruns if the handle changes.
     }, [channelHandle]); 
 
-    // 4. The hook returns the details (or null/false during loading/failure).
-    return channelDetails;
+   // 3. Calculate ownership status based on fetched data.
+    const isOwner = channelDetails && (channelDetails.owner === loggedInUserId);
+
+    // 4. Return both the details and the ownership status.
+    return { channelDetails, isOwner };
 };
 
 export default useFetchChannelDetails;

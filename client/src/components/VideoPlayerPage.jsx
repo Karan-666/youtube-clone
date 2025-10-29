@@ -8,6 +8,10 @@ import { AiOutlineLike, AiOutlineDislike, AiOutlineShareAlt, AiOutlineDownload }
 import CommentCard from './CommentCard.jsx';
 import AddCommentForm from './AddCommentForm.jsx';
 
+// 1. NEW: Import Redux hook and Axios.
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+
 function VideoPlayerPage() {
 
     // 2. NEW: State variable used to force the custom hook to re-run.
@@ -19,11 +23,20 @@ function VideoPlayerPage() {
    // Call the custom hook to fetch the video details using the ID.
     const videoDetails = useFetchVideoDetail(videoId, refetchTrigger);
 
+    // 2. NEW: Retrieve token and login status from Redux.
+    const { token, isLoggedIn } = useSelector((store) => store.user);
+
     // 4. Function called by the AddCommentForm upon successful submission.
     function handleCommentAdded(){
         // Incrementing the state value forces the component (and thus the hook) to re-render and refetch.
         setRefetchTrigger(prev => prev + 1); 
         console.log('Refetch triggered. The comments array will now refresh.');
+    };
+
+    // Function called by the forms upon successful action (reused for likes).
+    const handleRefetch = () => {
+        setRefetchTrigger(prev => prev + 1); 
+        console.log('Refetch triggered for counts/comments.');
     };
 
     
@@ -52,10 +65,36 @@ function VideoPlayerPage() {
         return count;
     };
 
-    // Placeholder function for like/dislike click logic (Will use API later).
-    const handleLikeClick = (type) => {
-        console.log(`Action: ${type} button clicked for video ${videoId}`);
-        // Logic to dispatch API call will go here.
+    // 3. UPDATE: Function to handle like/dislike clicks.
+    const handleLikeClick = async (type) => {
+        // Must be logged in to interact.
+        if (!isLoggedIn) {
+            alert("Please sign in to like or dislike videos.");
+            return;
+        }
+
+        try {
+            // Send the protected POST request.
+            await axios.post(
+                // API URL: POST /api/video/:id/interact
+                `http://localhost:8080/api/video/${videoId}/interact`,
+                // Payload: Send the action type ('like' or 'dislike').
+                { actionType: type },
+                // Configuration object: Authorization header with JWT token.
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}` 
+                    }
+                }
+            );
+
+            // If successful, force the video details to refresh instantly.
+            handleRefetch();
+
+        } catch (error) {
+            console.error(`Failed to post ${type}:`, error.response?.data?.message || error.message);
+            alert("Failed to record interaction. Please ensure you are logged in.");
+        }
     };
 
     // Once videoDetails is loaded (not null and not false):
@@ -144,7 +183,7 @@ function VideoPlayerPage() {
                             onCommentAdded={handleCommentAdded} // NEW: The form calls this function on success.
                         />
                         
-                        <div className="space-y-4">
+                        <div className="space-y-4 pt-4">
                             {/* 3. Map over the comments array embedded in the video document. */}
                             {videoDetails.comments && videoDetails.comments.map((comment, index) => (
                                 // Use a combination of user ID and index as a unique key for list rendering.

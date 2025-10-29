@@ -5,6 +5,9 @@ import VideoModel from "../models/Video.model.js";
 
 import mongoose from 'mongoose';
 
+// 1. NEW: Import the User Model.
+import UserModel from "../models/User.model.js";
+
 // Function to handle fetching all videos for the homepage grid.
 export async function fetchAllVideos(req, res) {
     try {
@@ -281,5 +284,49 @@ export async function editComment(req, res) {
         // 6. Handle any server or database errors.
         console.error("Error editing comment:", error);
         return res.status(500).json({ message: "Internal server error while editing comment." });
+    }
+}
+
+// Function to handle updating the like or dislike count (Protected POST)
+export async function updateLikeDislike(req, res) {
+    try {
+        // 1. Get the video ID from the URL path.
+        const { id: videoId } = req.params; 
+        // 2. Get the action type ('like' or 'dislike') from the request body.
+        const { actionType } = req.body; 
+
+        // Check if the actionType is valid.
+        if (actionType !== 'like' && actionType !== 'dislike') {
+            return res.status(400).json({ message: "Invalid action type. Must be 'like' or 'dislike'." });
+        }
+        
+        // 3. Determine which field to increment. 
+        const updateField = actionType === 'like' ? 'likes' : 'dislikes';
+        
+        // 4. Use findByIdAndUpdate with the $inc operator (simple increment).
+        const updatedVideo = await VideoModel.findByIdAndUpdate(
+            videoId, 
+            {
+                // Increment the chosen field (likes or dislikes) by 1.
+                $inc: { [updateField]: 1 } 
+            },
+            { new: true } // Return the updated video document.
+        );
+
+        // 5. Check if the video was found.
+        if (!updatedVideo) {
+            return res.status(404).json({ message: "Video not found. Cannot update count." });
+        }
+
+        // 6. Send a success response (200 OK).
+        return res.status(200).json({ 
+            message: `${actionType} count updated successfully!`,
+            likes: updatedVideo.likes,
+            dislikes: updatedVideo.dislikes
+        });
+
+    } catch (error) {
+        console.error("Error updating like/dislike count:", error);
+        return res.status(500).json({ message: "Internal server error while updating count." });
     }
 }

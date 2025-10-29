@@ -12,9 +12,10 @@ import useFetchChannelDetails from '../hooks/useFetchChannelDetails.js';
 function ChannelPage() {
     // 1. Get the channel handle from the URL (we will set up the route next).
     const { handle } = useParams();
+
+    // 1. NEW: Update hook call to destructure both details and isOwner.
+    const { channelDetails, isOwner } = useFetchChannelDetails(handle);
     
-    // 3. Call the custom hook to fetch the channel details.
-    const channelDetails = useFetchChannelDetails(handle);
     
     // Placeholder for checking if the logged-in user owns this page (will be implemented next)
     const isChannelOwner = false; 
@@ -72,12 +73,14 @@ function ChannelPage() {
                     </div>
                 </div>
                 
-                {/* 8. Action Buttons (Upload/Edit/Subscribe) */}
-                {isChannelOwner ? (
+                {/* 2. UPDATE: Action Buttons (Upload/Subscribe) */}
+                {isOwner ? (
+                    // Show "Upload Video" button only to the owner.
                     <button className="bg-red-600 text-white px-4 py-2 rounded-full font-medium hover:bg-red-700 transition-colors">
                         Upload Video
                     </button>
                 ) : (
+                    // Show "Subscribe" button to visitors.
                     <button className="bg-red-600 text-white px-4 py-2 rounded-full font-medium hover:bg-red-700 transition-colors">
                         Subscribe
                     </button>
