@@ -153,6 +153,7 @@ function VideoPlayerPage() {
                                     comment={comment} 
                                     videoId={videoId}           // 1. NEW: Pass the video ID to the CommentCard.
                                     onDelete={handleCommentAdded} // 2. NEW: Pass the refetch trigger for deletion.
+                                    onEditSuccess={handleCommentAdded} // Passed for Edit refresh
                                 />
                             ))}
                             

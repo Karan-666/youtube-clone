@@ -3,6 +3,8 @@
 // Import the Video Model so we can interact with the 'videos' collection in MongoDB.
 import VideoModel from "../models/Video.model.js";
 
+import mongoose from 'mongoose';
+
 // Function to handle fetching all videos for the homepage grid.
 export async function fetchAllVideos(req, res) {
     try {
@@ -241,6 +243,10 @@ export async function editComment(req, res) {
         const { id: videoId } = req.params; 
         // 2. Get the comment ID and the new text from the request body.
         const { commentId, newText } = req.body; 
+
+
+        // CRITICAL FIX: Convert commentId string to Mongoose ObjectId for the query.
+        const objectCommentId = new mongoose.Types.ObjectId(commentId);
         
         // 3. Use findOneAndUpdate with the Positional Operator ($).
         // This query finds the video by ID AND finds the comment to be updated.
@@ -248,7 +254,7 @@ export async function editComment(req, res) {
         const updatedVideo = await VideoModel.findOneAndUpdate(
             // Query: Find the video with this ID and where the comments array contains a document 
             // with the specified commentId.
-            { _id: videoId, "comments._id": commentId },
+            { _id: videoId, "comments._id": objectCommentId },
             {
                 // $set operator is used with the positional operator ($).
                 // $ tells MongoDB: "Update the element you just found in the comments array."

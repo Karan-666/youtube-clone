@@ -101,13 +101,18 @@ function CommentCard({ comment, onDelete, videoId, onEditSuccess }) {
         newText: editedText.trim(),
       };
 
+      console.log("Token being sent:", token);
+
       const headerObject = {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
+           "Content-Type": "application/json",
         },
       };
 
-      const response = axios.patch(api, body, headerObject);
+            console.log("PATCH Request:", api, body, headerObject);
+
+      const response = await axios.patch(api, body, headerObject);
 
       // 4. Check for success (status 200 OK from backend).
       if (response.status === 200) {

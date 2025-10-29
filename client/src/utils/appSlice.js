@@ -12,6 +12,7 @@ const appSlice = createSlice({
     isMenuOpen: true,
     // we need search state in redux as filter is in header but filtering logic is in body
     searchQuery: "",
+    selectedCategory: "All",
   },
 
   // Reducer functions define how the state can be updated.
@@ -27,11 +28,15 @@ const appSlice = createSlice({
     // Reducer to update the search query state.
     setSearchQuery : (state, action) => {
       state.searchQuery = action.payload;
-    }
+    },
+    // Reducer to update the selected category.
+        setCategory: (state, action) => {
+            state.selectedCategory = action.payload;
+        },
 
   },
 });
 
 // Export the actions and the reducer (for the store).
-export const { toggleMenu, closeMenu , setSearchQuery} = appSlice.actions;
+export const { toggleMenu, closeMenu , setSearchQuery, setCategory} = appSlice.actions;
 export default appSlice.reducer;

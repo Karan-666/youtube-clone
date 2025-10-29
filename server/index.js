@@ -26,7 +26,13 @@ const MONGODB_URI = 'mongodb://127.0.0.1:27017/youtube_clone_db';
 
 // Essential middleware to allow the frontend (client) to communicate with the backend (server).
 // This solves the CORS issue, as they run on different ports.
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
+    credentials: true, // if you're using cookies or JWT
+  })
+);
 
 // essential middleware for POST/PATCH/PUT requests to parse incoming JSON bodies.
 // Without this, req.body will be undefined in our controllers. (by default)
