@@ -2,7 +2,6 @@
 import {configureStore} from "@reduxjs/toolkit"
 // Default exported appSlice.reducer, importing as a name appReducer
 import appReducer from "./appSlice.js"
-
 import userReducer from "./userSlice.js"
 
 // configureStore creates the store and it accepts an object.

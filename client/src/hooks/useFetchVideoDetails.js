@@ -5,6 +5,7 @@ import axios from "axios";
 
 // The hook now accepts the unique ID of the video it needs to fetch.
 function useFetchVideoDetails(videoId, refetchTrigger) {
+
   // State to hold the single video document. Starts as null while loading.
   const [videoDetails, setVideoDetails] = useState(null);
 
@@ -33,9 +34,8 @@ function useFetchVideoDetails(videoId, refetchTrigger) {
 
     // Call the asynchronous function.
     fetchDetails();
-
-    // 2. NEW: The dependency array now includes refetchTrigger.
     // Changing this state variable forces a refresh of the video details (including new comments).
+    // as dependency array have refetchTrigger
   }, [videoId, refetchTrigger]);
 
   // The hook returns the details.

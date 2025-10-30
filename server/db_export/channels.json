@@ -1,0 +1,1 @@
+[{"_id":{"$oid":"68f75a1c2bdad574a85e907a"},"channelName":"My Coding Journey","handle":"@coder-karan","owner":{"$oid":"68f7185a44478018cd693910"},"description":"Welcome to my channel!","subscribers":0,"channelBanner":"https://example.com/default/banner.png","createdAt":{"$date":"2025-10-21T10:02:04.989Z"},"updatedAt":{"$date":"2025-10-21T10:02:04.989Z"},"__v":0}]

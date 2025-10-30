@@ -18,9 +18,9 @@ const app = express();
 // defining port
 const PORT = 8080;
 
-// connecting with local db
+// connecting with remote db
 // 'youtube_clone_db' is the name of our database.
-const MONGODB_URI = 'mongodb://127.0.0.1:27017/youtube_clone_db';
+const MONGODB_URI = 'mongodb+srv://karankumar00619_db_user:9ik99i5Ayp7oE4sF@cluster0.ddlnnqw.mongodb.net/youtube_clone_db';
 
 ///////////////////// MIDDLEWARE SECTION START //////////////////////
 

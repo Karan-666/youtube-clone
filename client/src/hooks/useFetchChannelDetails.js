@@ -3,19 +3,19 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-// 1. NEW: Import useSelector to access Redux state.
+// Import useSelector to access Redux state.
 import { useSelector } from 'react-redux';
 
 // The hook accepts the unique handle of the channel it needs to fetch.
-const useFetchChannelDetails = (channelHandle) => {
+function useFetchChannelDetails(channelHandle){
     
-    // 1. State to hold the single channel document. Starts as null while loading.
+    // State to hold the single channel document. Starts as null while loading.
     const [channelDetails, setChannelDetails] = useState(null);
 
-    // 2. NEW: Get the logged-in user's ID from Redux state.
+    // Get the logged-in user's ID from Redux state.
     const loggedInUserId = useSelector((store) => store.user.userId);
     
-    // 2. useEffect runs whenever the component mounts OR the channelHandle changes.
+    // useEffect runs whenever the component mounts OR the channelHandle changes.
     useEffect(() => {
         
         // Only run if a valid channelHandle is provided.
@@ -25,7 +25,7 @@ const useFetchChannelDetails = (channelHandle) => {
         const API_URL = `http://localhost:8080/api/channel/${channelHandle}`;
 
         // Define the asynchronous function to fetch the data.
-        const fetchDetails = async () => {
+        async function fetchDetails(){
             try {
                 // Use axios to make a GET request to the specific backend API endpoint.
                 const response = await axios.get(API_URL);
@@ -35,7 +35,7 @@ const useFetchChannelDetails = (channelHandle) => {
                     setChannelDetails(response.data);
                 }
             } catch (error) {
-                // Log the error if the API call fails (e.g., channel handle not found).
+                // Log the error if the API call fails (like channel handle not found).
                 console.error("Failed to fetch channel details:", error.response?.data?.message || error.message);
                 setChannelDetails(false); // Set to false to indicate failure/not found.
             }
@@ -43,13 +43,13 @@ const useFetchChannelDetails = (channelHandle) => {
 
         // Call the asynchronous function.
         fetchDetails();
-    // 3. The dependency array includes channelHandle. The hook reruns if the handle changes.
+    // The dependency array includes channelHandle. The hook reruns if the handle changes.
     }, [channelHandle]); 
 
-   // 3. Calculate ownership status based on fetched data.
+   // Calculate ownership status based on fetched data.
     const isOwner = channelDetails && (channelDetails.owner === loggedInUserId);
 
-    // 4. Return both the details and the ownership status.
+    // Return both the details and the ownership status.
     return { channelDetails, isOwner };
 };
 

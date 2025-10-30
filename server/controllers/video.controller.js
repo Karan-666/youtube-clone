@@ -70,35 +70,32 @@ export async function createVideo(req, res) {
     }
 }
 
-// Function to handle updating an existing video (PATCH operation)
-export async function updateVideo(req, res) {
-    try {
-        // Get the video ID from the dynamic URL path (req.params).
-        const { id } = req.params; 
-        
-        // we will simply find and update the video by ID.
-        // In a later step, we will add a check to ensure req.user._id matches the video's uploader ID.
+// Function to handle updating an existing video (Used by POST /api/video/:id/edit)
+export async function updateVideoPost(req, res) {
+    try {
+        // Get the video ID from the dynamic URL path (req.params).
+        const { id } = req.params; 
+        
+        // Use Mongoose to find the video by its ID and apply updates from req.body.
+        const updatedVideo = await VideoModel.findByIdAndUpdate(
+            id,              // First argument: The ID of the document to update.
+            req.body,        // Second argument: The data fields to change.
+            { new: true }    // Third argument: Return the NEW, updated document.
+        );
 
-        // Use Mongoose to find the video by its ID and apply updates from req.body.
-        const updatedVideo = await VideoModel.findByIdAndUpdate(
-            id,              // First argument: The ID of the document to update.
-            req.body,        // Second argument: The data fields to change.
-            { new: true }    // Third argument: Return the NEW, updated document.
-        );
+        // Check if the video was found and updated.
+        if (!updatedVideo) {
+            return res.status(404).json({ message: "Video not found with this ID." });
+        }
 
-        //  Check if the video was found and updated.
-        if (!updatedVideo) {
-            return res.status(404).json({ message: "Video not found with this ID." });
-        }
+        // Send a success response (200 OK) with the updated document.
+        return res.status(200).json(updatedVideo);
 
-        // Send a success response (200 OK) with the updated document.
-        return res.status(200).json(updatedVideo);
-
-    } catch (error) {
-        // Handle any server or database errors.
-        console.error("Error updating video:", error);
-        return res.status(500).json({ message: "Internal server error while updating video." });
-    }
+    } catch (error) {
+        // Handle any server or database errors.
+        console.error("Error updating video:", error);
+        return res.status(500).json({ message: "Internal server error while updating video." });
+    }
 }
 
 // Function to handle deleting an existing video (DELETE operation)
@@ -152,6 +149,7 @@ export async function addComment(req, res) {
         // Use $push to atomically add the new comment to the video's comments array.
         const updatedVideo = await VideoModel.findByIdAndUpdate(
             id,              // Find the video by its ID.
+            // push is like pushing data (append data) to array
             { $push: { comments: newComment } }, // Use $push to append to the 'comments' array.
             { new: true }    // Return the updated video document.
         );
@@ -239,86 +237,82 @@ export async function deleteComment(req, res) {
     }
 }
 
-// Function to handle editing an existing comment (Protected PATCH)
+// edit comment (using post instead of patch due to cors issues)
 export async function editComment(req, res) {
-    try {
-        // 1. Get the video ID from the URL path.
-        const { id: videoId } = req.params; 
-        // 2. Get the comment ID and the new text from the request body.
-        const { commentId, newText } = req.body; 
+    try {
+        // Get the video ID from the URL path.
+        const { id: videoId } = req.params; 
+        // Get the comment ID and the new text from the request body.
+        const { commentId, newText } = req.body; 
 
 
-        // CRITICAL FIX: Convert commentId string to Mongoose ObjectId for the query.
-        const objectCommentId = new mongoose.Types.ObjectId(commentId);
-        
-        // 3. Use findOneAndUpdate with the Positional Operator ($).
-        // This query finds the video by ID AND finds the comment to be updated.
-        // It's crucial for atomic updates within nested arrays.
-        const updatedVideo = await VideoModel.findOneAndUpdate(
-            // Query: Find the video with this ID and where the comments array contains a document 
-            // with the specified commentId.
-            { _id: videoId, "comments._id": objectCommentId },
-            {
-                // $set operator is used with the positional operator ($).
-                // $ tells MongoDB: "Update the element you just found in the comments array."
-                $set: { 
-                    "comments.$.text": newText, // Update only the 'text' field of the found comment.
-                    "comments.$.timestamp": new Date() // Optionally update the timestamp to reflect the edit time.
-                }
-            },
-            { new: true } // Return the updated video document.
-        );
+        // Convert commentId string to Mongoose ObjectId for the query.
+        const objectCommentId = new mongoose.Types.ObjectId(commentId);
+        
+        // Use findOneAndUpdate with the Positional Operator ($).
+        const updatedVideo = await VideoModel.findOneAndUpdate(
+            // Query: Find the video with this ID and where the comments array contains a document 
+            // with the specified commentId.
+            { _id: videoId, "comments._id": objectCommentId },
+            {
+                // $set operator is used with the positional operator ($).
+                $set: { 
+                    "comments.$.text": newText, // Update only the 'text' field of the found comment.
+                    "comments.$.timestamp": new Date() // Optionally update the timestamp to reflect the edit time.
+                }
+            },
+            { new: true } // Return the updated video document.
+        );
 
-        // 4. Check if the video/comment was found and updated.
-        if (!updatedVideo) {
-            return res.status(404).json({ message: "Video or Comment not found/authorized for editing." });
-        }
+        // Check if the video/comment was found and updated.
+        if (!updatedVideo) {
+            return res.status(404).json({ message: "Video or Comment not found/authorized for editing." });
+        }
 
-        // 5. Send a success response (200 OK).
-        return res.status(200).json({ 
-            message: "Comment updated successfully!",
-            updatedVideo: updatedVideo
-        });
+        // Send a success response (200 OK).
+        return res.status(200).json({ 
+            message: "Comment updated successfully!",
+            updatedVideo: updatedVideo
+        });
 
-    } catch (error) {
-        // 6. Handle any server or database errors.
-        console.error("Error editing comment:", error);
-        return res.status(500).json({ message: "Internal server error while editing comment." });
-    }
+    } catch (error) {
+        // Handle any server or database errors.
+        console.error("Error editing comment:", error);
+        return res.status(500).json({ message: "Internal server error while editing comment." });
+    }
 }
 
-// Function to handle updating the like or dislike count (Protected POST)
 export async function updateLikeDislike(req, res) {
     try {
-        // 1. Get the video ID from the URL path.
+        // getting id from url
         const { id: videoId } = req.params; 
-        // 2. Get the action type ('like' or 'dislike') from the request body.
+        // getting action actionType (like or dislike) from body
         const { actionType } = req.body; 
 
-        // Check if the actionType is valid.
+        // Validation check for action type.
         if (actionType !== 'like' && actionType !== 'dislike') {
             return res.status(400).json({ message: "Invalid action type. Must be 'like' or 'dislike'." });
         }
         
-        // 3. Determine which field to increment. 
+        // Determine which field to increment. 
         const updateField = actionType === 'like' ? 'likes' : 'dislikes';
         
-        // 4. Use findByIdAndUpdate with the $inc operator (simple increment).
+        // Use findByIdAndUpdate with the $inc operator (simple increment, ALWAYS +1).
+        // $inc is update operator. It tells MongoDB -> "Do an atomic increment operation on the following fields."
         const updatedVideo = await VideoModel.findByIdAndUpdate(
             videoId, 
             {
-                // Increment the chosen field (likes or dislikes) by 1.
-                $inc: { [updateField]: 1 } 
+                $inc: { [updateField]: 1 } // Increment the chosen field by 1.
             },
-            { new: true } // Return the updated video document.
+            { new: true } 
         );
 
-        // 5. Check if the video was found.
+        // Check if the video was found.
         if (!updatedVideo) {
             return res.status(404).json({ message: "Video not found. Cannot update count." });
         }
 
-        // 6. Send a success response (200 OK).
+        // Send a success response (200 OK).
         return res.status(200).json({ 
             message: `${actionType} count updated successfully!`,
             likes: updatedVideo.likes,

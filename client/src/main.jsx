@@ -38,7 +38,7 @@ const appRouter = createBrowserRouter([
         // The video player page component
         element: <VideoPlayerPage />,
       },
-      // 2. NEW: Dynamic route for the Channel Page.
+      // Dynamic route for the Channel Page.
       // The ':handle' segment captures the channel's unique handle.
       {
         path: "channel/:handle",

@@ -7,12 +7,10 @@ import { useNavigate } from "react-router-dom";
 import { IoClose } from "react-icons/io5";
 // axios for api calls
 import axios from "axios";
-
-import {loginUser} from "../utils/userSlice.js"
-
+import { loginUser } from "../utils/userSlice.js";
 import { useDispatch } from "react-redux";
 
-// This component will be passed visibility and close handlers as props
+// This component will be passed visibility and onClose handlers as props
 function AuthModal({ isVisible, onClose }) {
   // State to toggle between the Login and Register views.
   // if isLogin is true -> user in login state
@@ -28,17 +26,18 @@ function AuthModal({ isVisible, onClose }) {
   const navigate = useNavigate();
 
   // Simple function to reset all input fields.
-  const resetForm = () => {
+  function resetForm() {
     setUsername("");
     setEmail("");
     setPassword("");
-  };
+  }
 
   const dispatch = useDispatch();
 
   // Placeholder for the form submission logic (login/register API calls).
   async function handleSubmit(e) {
     e.preventDefault(); // Stop the form from causing a page reload.
+
     console.log(`Submitting as ${isLogin ? "Login" : "Register"}:`, {
       username,
       email,
@@ -46,6 +45,7 @@ function AuthModal({ isVisible, onClose }) {
     });
 
     // If in the Register view:
+
     if (!isLogin) {
       try {
         const payload = {
@@ -74,6 +74,8 @@ function AuthModal({ isVisible, onClose }) {
       }
     } else {
       try {
+        // If in the Login view:
+
         const payload = { email, password };
 
         // Execute API call and wait for response.
@@ -82,9 +84,9 @@ function AuthModal({ isVisible, onClose }) {
           payload
         );
 
-        // CHECK STATUS AND PROCESS SUCCESS: This block ONLY runs if status is 200-299.
+        // CHECK STATUS AND PROCESS SUCCESS: This block ONLY runs if status is 200
         if (res.status === 200) {
-          // Update Local Storage
+          // Update Local Storage with token and username
           localStorage.setItem("token", res.data.accessToken);
           localStorage.setItem("username", res.data.user.username);
           // Store the unique user ID to localStorage for owner checks.
@@ -92,7 +94,6 @@ function AuthModal({ isVisible, onClose }) {
 
           // Dispatch to Redux
           dispatch(
-            
             loginUser({
               accessToken: res.data.accessToken,
               username: res.data.user.username,
@@ -107,11 +108,8 @@ function AuthModal({ isVisible, onClose }) {
           resetForm();
           return; // Exit the function after success
         }
-
-        // Note: axios typically throws an error for 4xx/5xx status codes,
-        // so this 'if' block handles only the true success path.
       } catch (error) {
-        // 3. CATCH FAILURE: This block runs for bad passwords (401) or server crashes (500).
+        // This block runs for bad passwords (401) or server crashes (500).
         const message =
           error.response?.data?.message || "Login failed. Check server status.";
         alert(`Login Failed: ${message}`);
@@ -130,6 +128,7 @@ function AuthModal({ isVisible, onClose }) {
       {/* The actual modal content container. */}
       <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
         {/* Modal Header */}
+        {/* modal is a dialog box or a popup window that is displayed on top of the current page. */}
         <div className="flex justify-between items-center mb-6 border-b pb-3">
           <h2 className="text-2xl font-bold text-gray-800">
             {isLogin ? "Sign In" : "Register Account"}
@@ -144,6 +143,7 @@ function AuthModal({ isVisible, onClose }) {
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Username Field (Only visible during Registration) */}
+          {/* Shows Nothing for login case (!true is false) */}
           {!isLogin && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -202,6 +202,7 @@ function AuthModal({ isVisible, onClose }) {
           {isLogin ? "Don't have an account?" : "Already have an account?"}
           <button
             onClick={() => {
+              // FLIPS the state (true becomes false, false becomes true)
               setIsLogin(!isLogin);
               resetForm();
             }}

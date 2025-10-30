@@ -1,4 +1,4 @@
-// appSlice.js - Manages general application UI state (like sidebar visibility).
+// appSlice.js - Manages general application UI state (like sidebar visibility)
 
 import { createSlice } from "@reduxjs/toolkit";
 
@@ -26,17 +26,17 @@ const appSlice = createSlice({
       state.isMenuOpen = false;
     },
     // Reducer to update the search query state.
-    setSearchQuery : (state, action) => {
+    setSearchQuery: (state, action) => {
       state.searchQuery = action.payload;
     },
     // Reducer to update the selected category.
-        setCategory: (state, action) => {
-            state.selectedCategory = action.payload;
-        },
-
+    setCategory: (state, action) => {
+      state.selectedCategory = action.payload;
+    },
   },
 });
 
 // Export the actions and the reducer (for the store).
-export const { toggleMenu, closeMenu , setSearchQuery, setCategory} = appSlice.actions;
+export const { toggleMenu, closeMenu, setSearchQuery, setCategory } =
+  appSlice.actions;
 export default appSlice.reducer;

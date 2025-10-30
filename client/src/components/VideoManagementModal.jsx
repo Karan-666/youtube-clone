@@ -1,4 +1,4 @@
-// VideoManagementModal.jsx - Handles creation (POST) and updating (PATCH) of videos.
+// VideoManagementModal.jsx - Handles creationand updating of videos.
 
 import React, { useState, useEffect } from 'react';
 import { IoClose } from "react-icons/io5";
@@ -37,22 +37,22 @@ function VideoManagementModal({ isVisible, onClose, isEditMode, initialVideoData
         }
     }, [isEditMode, initialVideoData]); // Reruns when mode or data changes.
 
-
-    const handleSubmit = async (e) => {
+    // function to handle submit button after adding videos
+    // for both uplaod and edit of videos
+    async function handleSubmit(e){
         e.preventDefault();
         setLoading(true);
 
-        // 1. Determine API endpoint and HTTP Method.
+        // Determine API endpoint and HTTP Method.
         const videoId = initialVideoData?._id; // Get ID for the URL
-
         const URL = isEditMode 
-            ? `http://localhost:8080/api/video/${videoId}/edit` // CRITICAL FIX: Use the new POST route path
+            ? `http://localhost:8080/api/video/${videoId}/edit` // Use the new POST route path (Patch had cors issues with me)
             : 'http://localhost:8080/api/video'; // POST (Upload)
 
-        // 2. CRITICAL FIX: The method is always 'post' for both Upload and Edit now.
+        // The method is always 'post' for both Upload and Edit now.
         const method = 'post'; 
         
-        // 3. Prepare payload (UNCHANGED)
+        // Prepare payload 
         const payload = {
             title: title.trim(),
             description: description.trim(),
@@ -60,11 +60,12 @@ function VideoManagementModal({ isVisible, onClose, isEditMode, initialVideoData
             thumbnailUrl: thumbnailUrl.trim(),
             category,
             // Only required for POST/Upload: we set a placeholder channel ID.
+            // this is done to include channel id only in case of upload and not edit
             ...(method === 'post' && { channelId: 'channel01' }) 
         };
 
        try {
-            // 4. Send the authorized request using the 'post' method.
+            // Send the authorized request using the 'post' method.
             const response = await axios.post(URL, payload, { // Use axios.post regardless of mode
                 headers: { 'Authorization': `Bearer ${token}` }
             });

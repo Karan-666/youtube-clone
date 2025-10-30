@@ -1,15 +1,17 @@
+// this is simple custom hook to hit get api and store data in state and return it
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 function useFetchVideos(){
 
+    // state to hold video data
     const [videoData, setVideoData] = useState([]);
 
     const API = "http://localhost:8080/api/videos";
 
     useEffect(
         ()=>{
-
         async function useApi(){
             try{
                 const res = await axios.get(API);
@@ -18,7 +20,7 @@ function useFetchVideos(){
                     setVideoData(res.data);
                 }
             } catch(error){
-                // Log the error if the API call fails (e.g., server is down, 404 response).
+                // Log the error if the API call fails (like server is down, 404 response).
                 console.error("Failed to fetch videos from backend:", error.response?.data?.message || error.message);
             }
         }

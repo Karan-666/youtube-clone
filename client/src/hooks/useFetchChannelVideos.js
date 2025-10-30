@@ -2,17 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-// 1. We import the hook we just created to get the channel's owner ID.
+// import the hook we just created to get the channel's owner ID.
 import useFetchChannelDetails from './useFetchChannelDetails';
 
 // This hook requires the channel handle to find the owner.
-const useFetchChannelVideos = (channelHandle , refetchTrigger) => {
+function useFetchChannelVideos(channelHandle , refetchTrigger){
+
+    // state to keep channel videos
     const [channelVideos, setChannelVideos] = useState(null);
     
-    // 2. We use the channel details hook to get the owner's details first.
+    // We use the channel details hook to get the owner's details first.
     const { channelDetails } = useFetchChannelDetails(channelHandle);
 
-    // 3. useEffect runs when channelDetails becomes available.
+    // useEffect runs when channelDetails becomes available.
     useEffect(() => {
         // Only proceed if channel details have been successfully loaded and an owner ID exists.
         if (!channelDetails || !channelDetails.owner) {
@@ -21,7 +23,7 @@ const useFetchChannelVideos = (channelHandle , refetchTrigger) => {
             return;
         }
 
-        const fetchVideos = async () => {
+        async function fetchVideos(){
             try {
                 // IMPORTANT: We will use the existing fetchAllVideos endpoint and rely on 
                 // the frontend to filter by the owner's ID for simplicity and speed.
@@ -48,7 +50,7 @@ const useFetchChannelVideos = (channelHandle , refetchTrigger) => {
     // Re-run whenever the handle changes or the channelDetails object is updated.
     }, [channelDetails , refetchTrigger]); 
 
-    // 4. Return the list of videos.
+    // Return the list of videos.
     return channelVideos;
 };
 

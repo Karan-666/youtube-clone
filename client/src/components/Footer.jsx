@@ -1,9 +1,11 @@
+// Footer.jsx - Footer Component
+
 
 function Footer() {
   return (
-    // Placeholder for the application footer.
-    <div className="Footer-Container">
-      <h1>Footer Component</h1>
+    // Simple footer 
+    <div className="bg-gray-100 p-4 text-center text-sm text-gray-600 border-t mt-auto">
+      <p>&copy; 2025 YouTube Clone by Karan. All rights reserved.</p>
     </div>
   )
 }
