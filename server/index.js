@@ -18,8 +18,10 @@ const app = express();
 // defining port
 const PORT = 8080;
 
-// connecting with remote db
+// connecting to remote db using mongo db atlast
 // 'youtube_clone_db' is the name of our database.
+// exported data from local db to folder called db_export in server folder
+// imported data to remote mongo db atlas 
 const MONGODB_URI = 'mongodb+srv://karankumar00619_db_user:9ik99i5Ayp7oE4sF@cluster0.ddlnnqw.mongodb.net/youtube_clone_db';
 
 ///////////////////// MIDDLEWARE SECTION START //////////////////////
