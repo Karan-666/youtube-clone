@@ -55,3 +55,5 @@ To run the application, you must start the backend (Node/Express) and frontend (
 1. Open your browser to: `http://localhost:5173/`
 2. **Test Filtering**: Click the "Music" category button, then search for "Euphoria". The video list should filter instantly.
 3. **Test Channel Management**: Log in with the provided credentials and navigate to the Channel Page to perform Upload, Edit, and Delete on the videos.
+
+-> Added video for project demo
