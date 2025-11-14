@@ -1,5 +1,8 @@
 Github Link: https://github.com/Karan-666/youtube-clone
 
+Frontend deployment link: https://youtube-clone-xi-jade.vercel.app
+Backend deployment link: https://youtube-clone-8zd0.onrender.com
+
 # YouTube Clone Capstone Project: Full Stack Development (MERN)
 
 This is a full-stack video sharing platform built using the MERN Stack (MongoDB, Express, React, Node.js). The application replicates core YouTube features, focusing on:
