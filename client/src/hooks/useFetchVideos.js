@@ -8,7 +8,7 @@ function useFetchVideos(){
     // state to hold video data
     const [videoData, setVideoData] = useState([]);
 
-    const API = "http://localhost:8080/api/videos";
+    const API = "https://youtube-clone-8zd0.onrender.com/api/videos";
 
     useEffect(
         ()=>{

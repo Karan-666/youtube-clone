@@ -46,8 +46,8 @@ function VideoManagementModal({ isVisible, onClose, isEditMode, initialVideoData
         // Determine API endpoint and HTTP Method.
         const videoId = initialVideoData?._id; // Get ID for the URL
         const URL = isEditMode 
-            ? `http://localhost:8080/api/video/${videoId}/edit` // Use the new POST route path (Patch had cors issues with me)
-            : 'http://localhost:8080/api/video'; // POST (Upload)
+            ? `https://youtube-clone-8zd0.onrender.com/api/video/${videoId}/edit` // Use the new POST route path (Patch had cors issues with me)
+            : 'https://youtube-clone-8zd0.onrender.com/api/video'; // POST (Upload)
 
         // The method is always 'post' for both Upload and Edit now.
         const method = 'post'; 

@@ -54,7 +54,7 @@ function AuthModal({ isVisible, onClose }) {
           password,
         };
         const res = await axios.post(
-          "http://localhost:8080/api/register",
+          "https://youtube-clone-8zd0.onrender.com/api/register",
           payload
         );
 
@@ -80,7 +80,7 @@ function AuthModal({ isVisible, onClose }) {
 
         // Execute API call and wait for response.
         const res = await axios.post(
-          "http://localhost:8080/api/login",
+          "https://youtube-clone-8zd0.onrender.com/api/login",
           payload
         );
 

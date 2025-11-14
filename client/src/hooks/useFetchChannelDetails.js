@@ -22,7 +22,7 @@ function useFetchChannelDetails(channelHandle){
         if (!channelHandle) return; 
 
         // Define the URL for our backend API endpoint (GET /api/channel/:handle).
-        const API_URL = `http://localhost:8080/api/channel/${channelHandle}`;
+        const API_URL = `https://youtube-clone-8zd0.onrender.com/api/channel/${channelHandle}`;
 
         // Define the asynchronous function to fetch the data.
         async function fetchDetails(){

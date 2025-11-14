@@ -14,7 +14,7 @@ function useFetchVideoDetails(videoId, refetchTrigger) {
     // Only run if a valid videoId is provided.
     if (!videoId) return;
 
-    const API_URL = `http://localhost:8080/api/video/${videoId}`;
+    const API_URL = `https://youtube-clone-8zd0.onrender.com/api/video/${videoId}`;
 
     // Define the asynchronous function to fetch the data.
     async function fetchDetails() {
