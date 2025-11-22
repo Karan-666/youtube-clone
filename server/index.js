@@ -30,9 +30,13 @@ const MONGODB_URI = 'mongodb+srv://karankumar00619_db_user:9ik99i5Ayp7oE4sF@clus
 // This solves the CORS issue, as they run on different ports.
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    // Allow both your local computer and the deployed website
+    origin: [
+      "http://localhost:5173", 
+      "https://youtube-clone-xi-jade.vercel.app"
+    ],
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
-    credentials: true, // if you're using cookies or JWT
+    credentials: true,
   })
 );
 
