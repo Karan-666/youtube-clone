@@ -18,7 +18,7 @@ function Sidebar() {
     // We then subtract the height of the fixed header (h-14 which is 3.5rem) 
     // so the sidebar starts exactly below the header and runs all the way to the bottom of the screen.
     // overflow-y-auto-> If the content inside the sidebar gets too long to fit vertically, this enables a vertical scrollbar (y-auto) for the sidebar only.
-    <div className="p-5 shadow-lg flex-shrink-0 h-[calc(100vh-3.5rem)] overflow-y-auto w-48 sticky top-14 bg-white">
+    <div className="p-5 shadow-lg shrink-0 h-[calc(100vh-3.5rem)] overflow-y-auto w-48 sticky top-14 bg-white">
       
       {/* Main Section (Home, Trending, Subscriptions) */}
       <div className="pb-4 border-b">
