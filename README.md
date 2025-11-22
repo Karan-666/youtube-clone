@@ -1,8 +1,8 @@
 # YouTube Clone Capstone Project: Full Stack Development (MERN)
 
-**GitHub Link:** https://github.com/Karan-666/youtube-clone  
-**Frontend Deployment:** https://youtube-clone-xi-jade.vercel.app  
-**Backend Deployment:** https://youtube-clone-8zd0.onrender.com
+ 
+**Live Deployment:** https://youtube-clone-xi-jade.vercel.app  
+
 
 ## 🎬 Project Overview
 
